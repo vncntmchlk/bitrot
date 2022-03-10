@@ -34,3 +34,5 @@ Tdef(\fftBinsGainSmooth).play
 ~gameFFT.seedMe
 
 Tdef(\fftBinsGainSmooth).stop
+
+~gameFFT.relevantCa

@@ -32,3 +32,15 @@ SynthDef(\help_PlayBuf, {| out = 0, bufnum = 0 |
 ~toBenni.sendMsg("/bitrotData", "fftXbins", *[4, 8, 16, 32, 64]) // bins
 ~toBenni.sendMsg("/bitrotData", "fftXbins", *[8, 16, 32, 64, 128]) // bins
 
+
+Rect(10, 10, 260, 10).height
+
+// spectrogram in a window
+(
+w = Window.new("spectrogram".scramble, Rect(10,10, 300, 60)).front;
+a = Spectrogram3.new(w, Rect(10, 10, 260, 50));
+a.start;
+a.intensity = 50;
+// {SinOsc.ar(MouseY.kr(50,1000))}.play;
+{SoundIn.ar([2,3])}.play;
+)

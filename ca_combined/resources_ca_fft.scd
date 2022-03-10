@@ -165,7 +165,7 @@ Tdef(\fftBinsGainSmooth, {
 	var sendDb;
 	var dbArr = [
 		[-15, 12],
-		[-15, 15],
+		[-9, 21],
 		[-21, 21],
 		[-27, 21],
 		[-36, 21],
@@ -183,7 +183,7 @@ Tdef(\fftBinsGainSmooth, {
 				var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
 				~gameFFT.colSums = blendedColSums;
 				~gameFFT.visualize; //~game.visualize(false);
-				sendDb = ~gameFFT.colSums[3..8].collect {|v, ix|
+				sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
 					v = emphasizeMidSection[v];
 					v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
 				};
@@ -194,7 +194,7 @@ Tdef(\fftBinsGainSmooth, {
 			lastColSums = nextColSums;
 		}{
 			~gameFFT.nextGen;
-			sendDb = ~gameFFT.colSums[3..8].collect {|v, ix|
+			sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
 				v = emphasizeMidSection[v];
 				v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
 			};
