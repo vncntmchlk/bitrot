@@ -1,11 +1,15 @@
-//  fft und rhythms kombinieren. gemeinsame steueroberlfaeche mit openstage kreieren
 (
 thisProcess.openUDPPort(9010);
 ~toBenni = NetAddr("10.42.0.171", 7401);
 ~localHost = NetAddr("127.0.0.1", 9001);
 "../oscMidiEvent.scd".loadRelative;
-"resources.scd".loadRelative;
+"../ca_rhythm/resources.scd".loadRelative;
+"resources_ca_fft.scd".loadRelative;
 )
+
+
+
+
 ~game1 = ~newCaRhythm.((), prefix: "rhy1");
 ~game1Player = ~game1.spawner.play(quant: 2);
 ~game1Player.stop
@@ -21,25 +25,12 @@ thisProcess.openUDPPort(9010);
 ).asStream;
 ~game2.hitColor = \blue;
 
-x = Pbind(
-	\dur, 1/8,
-	\instrument, \no,
-	\type, \oscMidi,
-	\amp, Pwhite(0.1,0.9),
-	\chan, 13,
-	\midinote,36,
-	// \db, -50,
-	\netAddr, ~toBenni
-).play
-x.stop
 
-x = Pbind(
-	\dur, 1/2,
-	\instrument, \no,
-	\type, \oscMidi,
-	\amp, Pwhite(0.1,0.9),
-	\chan, 11,
-	\midinote,36,
-	// \db, -50,
-	\netAddr, ~toBenni
-).play
+//die werte sollten am besten so skaliert werden, dass in den mittleren grauen bereichen am meisten aenderung ist
+~gameFFT = ~caFFT.(16, 6);
+
+Tdef(\fftBinsGainSmooth).play
+
+~gameFFT.seedMe
+
+Tdef(\fftBinsGainSmooth).stop
