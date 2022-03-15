@@ -12,16 +12,24 @@ thisProcess.openUDPPort(9010);
 "../oscMidiEvent.scd".loadRelative;
 "../ca_rhythm/resources.scd".loadRelative;
 "resources_ca_fft.scd".loadRelative;
+"resources_ca_bitflip.scd".loadRelative;
 )
 
 ~game1 = ~newCaRhythm.((), prefix: "rhy1");
-~game1Player = ~game1.spawner.play(quant: 2);
-~game1Player.stop
+Pdef(\rhy1spawner).play(quant: 1)
+Pdef(\rhy1spawner).stop
 
-~game1.pbindChain = Pbind(
-	\callFunc, Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0}
+~game1.evPat = Pbind(
+	\loopOnOff, Pseq([false, true, true, true], inf),
+	\pulseSpeed, Pseq([1/8],inf),
+	\steps, 4,
+	\chan, 13,
+	\midinote, 36
+).asStream;
+/*~game1.pbindChain = Pbind(
+\callFunc, Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0}
 )
-~game1.pbindChain = Pbind()
+~game1.pbindChain = Pbind()*/
 ~game1.evPat = Pbind(
 	\pulseSpeed, Pseq([1/8],inf),
 	\steps, 8,
@@ -53,6 +61,8 @@ Tdef(\fftBinsGainSmooth).play
 Tdef(\fftBinsGainSmooth).stop
 
 ~gameFFT.relevantCa
+
+~gameBitFlip = ~caBitFlip.(16, 6);
 
 
 ~click = Pbind(

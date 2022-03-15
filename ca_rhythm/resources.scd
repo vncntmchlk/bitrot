@@ -7,6 +7,8 @@
 	ev.sharedEv = OSCSharedEvent.new(~localHost, prefix);
 	ev.sharedEv.caSize = 16;
 	ev.sharedEv.linkFFTCa = 0;
+	ev.sharedEv.linkBitFlip = 0;
+	ev.sharedEv.onOff = 0;
 
 	ev.makeLinkToFFTCa = {|onOff|
 		ev.pbindChain = if(onOff.asBoolean){
@@ -15,6 +17,14 @@
 			Pbind()
 		};
 		ev.sharedEv.linkFFTCa = onOff; // falls man es manuell aendert aenderung zu osc schickens
+	};
+	ev.makeLinkToBitFlip = {|onOff|
+		ev.pbindChain = if(onOff.asBoolean){
+			Pbind(\callFunc, Pfunc{|ev| if(ev.amp > 0){Pdefn(\bitflipNext).asStream.next};0})
+		}{
+			Pbind()
+		};
+		ev.sharedEv.linkBitFlip = onOff;
 	};
 
 	ev.buttonStates = 0 ! ev.maxSize;
@@ -96,7 +106,16 @@
 	ev.sharedEv.makeOSCdefsForKeys((
 		currentRule: ev[\makeRules],
 		caSize: ev[\changeSize],
-		linkFFTCa: ev[\makeLinkToFFTCa]
+		linkFFTCa: ev[\makeLinkToFFTCa],
+		linkBitFlip: ev[\makeLinkToBitFlip],
+		onOff: {|onOff|
+			if(onOff.asBoolean){
+				Pdef((prefix ++ "spawner").asSymbol).play(quant: 1)
+			}{
+				Pdef((prefix ++ "spawner").asSymbol).stop
+			};
+			ev.sharedEv.onOff = onOff;
+		}
 	));
 	ev.sharedEv.sendAll;
 
@@ -155,6 +174,7 @@
 	ev.nextLevel = nil!(ev.maxSize + 1);
 	// structure pbind, next event at each step
 	ev.evPat = Pbind(
+		\loopOnOff, true,
 		\pulseSpeed, Pseq([1/8],inf),
 		\steps, 4,
 		\chan, 13,
@@ -163,66 +183,91 @@
 	ev.pbindChain = Pbind();
 	ev.spawner = Pspawner({ |sp|
 		var stepEv = ev.evPat.next(());
+		var loopPbind;
+		var accumGens = [0];
 		inf.do {
+			var loop, loopGen = false;
 			stepEv.steps.do { |step|
-				var durTime, accumGens = [0];
-				durTime = stepEv.pulseSpeed;
-				ev.gen.myGen.do { |val, ix|
-					if(val.asBoolean){
-						var mixedGen, mixedGenPbind, countAndValArrays;
-						if(ev.lastGen.notNil){
-							// wenn zuvor 0 war
-							if(ev.lastGen[ix].asBoolean.not and:{step == 0}){
-								ev.nextLevel[ix] = ev[\ca].();
-							}{// falls zuvor schon 1 war
-								ev.nextLevel[ix].nextGen;
-							};
-						}{
-							if(step == 0){
-								ev.nextLevel[ix] = ev[\ca].();
-							}{
-								ev.nextLevel[ix].nextGen;
-							};
-						};
-						mixedGen = ev.nextLevel[ix].myGen * ev.gen.myGen;
-						ev.nextLevel[ix].mixedGen = mixedGen;
-						accumGens = accumGens + mixedGen;
-					}{
-						ev.nextLevel[ix] = nil;
+				loop = stepEv.loopOnOff and: {loopPbind.notNil and: {accumGens.sum > 0}};
+				// "loopGen: ".post; loopGen.postln;
+				if(loop){
+					"looping".postln;
+					sp.par(loopPbind);
+					ev.sharedEv.caSize.do { |i|
+						{
+							ev.drawIndex = i;
+							ev.view.refresh
+						}.fork(AppClock);
+						sp.wait(stepEv.pulseSpeed);
 					};
-				};
-				//accumGens.postln;
-				if(accumGens.size > 1){
-					sp.par(
-						ev.pbindChain <> Pbind(
+				}{
+					var durTime;
+					loopGen = true;
+					accumGens = [0];
+					durTime = stepEv.pulseSpeed;
+					" notlooping".postln;
+					ev.gen.myGen.do { |val, ix|
+						if(val.asBoolean){
+							var mixedGen, mixedGenPbind;
+							if(ev.lastGen.notNil){
+								// wenn zuvor 0 war
+								if((ev.lastGen[ix].asBoolean.not and:{step == 0}) or:
+									{ev.nextLevel[ix].isNil}){
+									ev.nextLevel[ix] = ev[\ca].();
+								}{// falls zuvor schon 1 war
+									ev.nextLevel[ix].nextGen;
+								};
+							}{
+								if((step == 0) or: {ev.nextLevel[ix].isNil}){
+									ev.nextLevel[ix] = ev[\ca].();
+								}{
+									ev.nextLevel[ix].nextGen;
+								};
+							};
+							mixedGen = ev.nextLevel[ix].myGen * ev.gen.myGen;
+							ev.nextLevel[ix].mixedGen = mixedGen;
+							accumGens = accumGens + mixedGen;
+						}{
+							ev.nextLevel[ix] = nil;
+						};
+					};
+					//accumGens.postln;
+					if(accumGens.size > 1){
+						loopPbind = ev.pbindChain <> Pbind(
 							\dur, stepEv.pulseSpeed,
 							\instrument, \no,
 							\type, \oscMidi,
 							\amp, Pseq(accumGens / ev.sharedEv.caSize),
 							\chan, stepEv.chan,
 							\midinote, stepEv.midinote,
-							// \db, -50,
 							\netAddr, ~toBenni
-						)
-					);
-				};
-				//visualize
-				ev.sharedEv.caSize.do { |i|
-					{
-						ev.drawIndex = i;
-						ev.view.refresh
-					}.fork(AppClock);
-					sp.wait(stepEv.pulseSpeed);
+						);
+						sp.par(loopPbind);
+					};
+					//visualize
+					ev.sharedEv.caSize.do { |i|
+						{
+							ev.drawIndex = i;
+							ev.view.refresh
+						}.fork(AppClock);
+						sp.wait(stepEv.pulseSpeed);
+					};
 				};
 				//
 				// sp.wait(stepEv.pulseSpeed * ev.sharedEv.caSize);
 				stepEv = ev.evPat.next(());
 			};
 
-			ev.lastGen = ev.gen.myGen;
-			ev.gen.nextGen;
+			if(loopGen){
+				"new gen".postln;
+				ev.lastGen = ev.gen.myGen;
+				ev.gen.nextGen;
+			}{
+				"NO new gen".postln;
+			};
 		};
 	});
+	Pdef((prefix ++ "spawner").asSymbol, ev.spawner);
 
 	ev
 };
