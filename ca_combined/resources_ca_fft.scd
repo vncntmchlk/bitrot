@@ -9,8 +9,7 @@
 	~sharedEvFFT.currentRule = startRules;
 	~sharedEvFFT.sendRate = 2;
 	~sharedEvFFT.blendSteps = 10;
-	~sharedEvFFT.makeOSCdefsForKeys;
-	~sharedEvFFT.sendAll;
+	~sharedEvFFT.caRange = [0, 5];
 
 	win = Window.new(bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize)).front;
 	win.view.background_(Color.black);
@@ -65,9 +64,9 @@
 			game.myGen = 0 ! ~sharedEvFFT.caSize; // das vorhandene kopieren ..
 			game.seedMe;
 			game.sumColums; // das ist wahrscheinlich notwendig?
-			game.onlyShow(game.relevantSize);
+			game[\onlyShow].(~sharedEvFFT.caRange);
 			// resize window ..
-			game.resizeWindow
+			{game.resizeWindow}.fork(AppClock);
 		},
 		newLastValuesSize: { |newSize = 10|
 			if(newSize != game.saveLastValuesSize){
@@ -83,7 +82,7 @@
 				~sharedEvFFT.lastValuesSize = newSize;
 				game.sumColums;
 				// resize window ..
-				game.resizeWindow
+				{game.resizeWindow}.fork(AppClock);
 			}
 		},
 		nextGen: { |self, visualize = true|
@@ -122,85 +121,196 @@
 				'111': arr[7]
 			)
 		},
-		onlyShow: { |self, howMany|
+		onlyShow: { |range|
 			var caMid = (~sharedEvFFT.caSize / 2).asInteger;
-			var start = caMid - (howMany / 2).asInteger;
-			var end = start + howMany;
-			self.relevantSize = howMany;
-			self.relevantCa = [start, end]
+			var relevantSize = range[1] - range[0] + 1;
+			var start = caMid - 3 + range[0]; //(relevantSize / 2).asInteger;
+			var end = start + relevantSize;
+			game.delayedCaRange = range; // necessary for Tdef
+			game.relevantCa = [start, end]
 		}
 	);
 
-	game.onlyShow(6);
+	game[\onlyShow].(~sharedEvFFT.caRange);
 	game[\makeRules].(startRules);
 
-	~updateCaSizeFFT = ~sharedEvFFT.connectTo(game[\newCaSize])
-	.filter({ |object, what, value| what == \caSize })
-	.transform({ |object, what, value| [object.caSize, what, value].postln });
-	OSCdef(\updateCaSizeFFT, {
-		{~sharedEvFFT.changed(\caSize)}.defer(0.1)
-	}, '/fft/caSize').fix;
-
-	~updateLastValuesSizeFFT = ~sharedEvFFT.connectTo(game[\newLastValuesSize])
-	.filter({ |object, what, value| what == \lastValuesSize })
-	.transform({ |object, what, value| [object.lastValuesSize, what, value].postln });
-	OSCdef(\updateLastValuesSizeFFT, {
-		{~sharedEvFFT.changed(\lastValuesSize)}.defer(0.1)
-	}, '/fft/lastValuesSize').fix;
-
-	~updateCurrentRule = ~sharedEvFFT.connectTo(game[\makeRules])
-	.filter({ |object, what, value| what == \currentRule })
-	.transform({ |object, what, value| [object.currentRule, what, value].postln });
-	OSCdef(\updateCurrentRuleFFT, {
-		{~sharedEvFFT.changed(\currentRule)}.defer(0.1)
-	}, '/fft/currentRule').fix;
+	~sharedEvFFT.makeOSCdefsForKeys((
+		caSize: game[\newCaSize],
+		lastValuesSize: game[\newLastValuesSize],
+		currentRule: game[\makeRules],
+		caRange: game[\onlyShow]
+	));
+	~sharedEvFFT.sendAll;
 
 	game
 };
-
 
 Tdef(\fftBinsGainSmooth, {
 	var lastColSums = 0 ! ~sharedEvFFT.caSize;
 	var nextColSums;
 	var sendDb;
+	var sendDbDummy = -60!6;
 	var dbArr = [
-		[-15, 12],
-		[-9, 21],
-		[-21, 21],
-		[-27, 21],
-		[-36, 21],
-		[-9, 36]
+		[-15, 1],
+		[-9, 1],
+		[-21, 1],
+		[-27, 1],
+		[-36, 1],
+		[-9, 1]
 	];
 	var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
+	var calcDbArray = {
+		var res = sendDbDummy.copy;
+		~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].do {|v, ix|
+			res[ix + ~gameFFT.delayedCaRange[0]] = emphasizeMidSection[v].linlin(0, 1, *dbArr[ix])
+		};
+		res
+	};
 	loop {
 		var blendSteps = ~sharedEvFFT.blendSteps;
 		var sendRate = ~sharedEvFFT.sendRate; // Hz
-		if(~sharedEvFFT.blendSteps > 1){
-			var waitTime = (~sharedEvFFT.sendRate * blendSteps).reciprocal;
+		if(blendSteps > 1){
+			var waitTime = (sendRate * blendSteps).reciprocal;
 			~gameFFT.nextGen(false);
 			nextColSums = ~gameFFT.colSums;
 			blendSteps.do { |step|
 				var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
 				~gameFFT.colSums = blendedColSums;
-				~gameFFT.visualize; //~game.visualize(false);
-				sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
-					v = emphasizeMidSection[v];
-					v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
-				};
-				// sendDb = ~gameFFT.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
+				~gameFFT.visualize;
+				sendDb = calcDbArray.();
 				~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
 				waitTime.wait;
 			};
 			lastColSums = nextColSums;
 		}{
 			~gameFFT.nextGen;
-			sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
-				v = emphasizeMidSection[v];
-				v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
-			};
-			// sendDb = ~gameFFT.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
+			sendDb = calcDbArray.();
 			~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
 			sendRate.reciprocal.wait;
 		}
 	}
+});
+
+Pdefn(\caFFTNext, Routine {
+	var lastColSums = 0 ! ~sharedEvFFT.caSize;
+	var nextColSums;
+	var sendDb;
+	var sendDbDummy = -60!6;
+	var dbArr = [
+		[-15, 1],
+		[-9, 1],
+		[-21, 1],
+		[-27, 1],
+		[-36, 1],
+		[-9, 1]
+	];
+	var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
+	var calcDbArray = {
+		var res = sendDbDummy.copy;
+		~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].do {|v, ix|
+			res[ix + ~gameFFT.delayedCaRange[0]] = emphasizeMidSection[v].linlin(0, 1, *dbArr[ix])
+		};
+		res
+	};
+	loop {
+		var blendSteps = ~sharedEvFFT.blendSteps;
+		~gameFFT.nextGen;
+		sendDb = calcDbArray.();
+		~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
+		1.yield;
+	}
+});
+
+/*Tdef(\fftBinsGainSmooth, {
+var lastColSums = 0 ! ~sharedEvFFT.caSize;
+var nextColSums;
+var sendDb;
+var dbArr = [
+[-15, 12],
+[-9, 21],
+[-21, 21],
+[-27, 21],
+[-36, 21],
+[-9, 36]
+];
+var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
+loop {
+var blendSteps = ~sharedEvFFT.blendSteps;
+var sendRate = ~sharedEvFFT.sendRate; // Hz
+if(~sharedEvFFT.blendSteps > 1){
+var waitTime = (~sharedEvFFT.sendRate * blendSteps).reciprocal;
+~gameFFT.nextGen(false);
+nextColSums = ~gameFFT.colSums;
+blendSteps.do { |step|
+var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
+~gameFFT.colSums = blendedColSums;
+~gameFFT.visualize; //~game.visualize(false);
+sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
+v = emphasizeMidSection[v];
+v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
+};
+// sendDb = ~gameFFT.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
+~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
+waitTime.wait;
+};
+lastColSums = nextColSums;
+}{
+~gameFFT.nextGen;
+sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
+v = emphasizeMidSection[v];
+v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
+};
+// sendDb = ~gameFFT.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
+~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
+sendRate.reciprocal.wait;
+}
+}
+})*/
+
+/* hier bins MIN, variablen muessen noch umbenannt werden
+Tdef(\fftBinsMin, {
+var lastColSums = 0 ! ~sharedEvFFT.caSize;
+var nextColSums;
+var sendDb;
+var dbArr = [
+[0, 6],
+[0, 5],
+[0, 4],
+[0, 3],
+[0, 2],
+[0, 1]
+];
+var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
+loop {
+var blendSteps = ~sharedEvFFT.blendSteps;
+var sendRate = ~sharedEvFFT.sendRate; // Hz
+if(~sharedEvFFT.blendSteps > 1){
+var waitTime = (~sharedEvFFT.sendRate * blendSteps).reciprocal;
+~gameFFT.nextGen(false);
+nextColSums = ~gameFFT.colSums;
+blendSteps.do { |step|
+var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
+~gameFFT.colSums = blendedColSums;
+~gameFFT.visualize; //~game.visualize(false);
+sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
+v = emphasizeMidSection[v];
+v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
+};
+// sendDb = ~gameFFT.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
+~toBenni.sendMsg("/bitrotData", "fftBinsMin", *sendDb);
+waitTime.wait;
+};
+lastColSums = nextColSums;
+}{
+~gameFFT.nextGen;
+sendDb = ~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].collect {|v, ix|
+v = emphasizeMidSection[v];
+v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
+};
+// sendDb = ~gameFFT.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
+~toBenni.sendMsg("/bitrotData", "fftBinsMin", *sendDb);
+sendRate.reciprocal.wait;
+}
+}
 })
+*/

@@ -6,6 +6,17 @@
 
 	ev.sharedEv = OSCSharedEvent.new(~localHost, prefix);
 	ev.sharedEv.caSize = 16;
+	ev.sharedEv.linkFFTCa = 0;
+
+	ev.makeLinkToFFTCa = {|onOff|
+		ev.pbindChain = if(onOff.asBoolean){
+			Pbind(\callFunc, Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0})
+		}{
+			Pbind()
+		};
+		ev.sharedEv.linkFFTCa = onOff; // falls man es manuell aendert aenderung zu osc schickens
+	};
+
 	ev.buttonStates = 0 ! ev.maxSize;
 	ev.maxSize.do { |i|
 		OSCdef((prefix ++ 'button' ++ i).asSymbol, { |msg|
@@ -82,20 +93,13 @@
 
 	ev.sharedEv.currentRule = 86;
 
-	ev.sharedEv.makeOSCdefsForKeys;
-	ev.updateRules = ev.sharedEv.connectTo(ev[\makeRules])
-	.filter({ |object, what, value| what == \currentRule })
-	.transform({ |object, what, value| [object.currentRule, what, value].postln });
-	OSCdef((prefix ++ "updateCurrentRule").asSymbol, {
-		{ev.sharedEv.changed(\currentRule)}.defer(0.1)
-	}, "/" +/+ prefix +/+ '/currentRule').fix;
+	ev.sharedEv.makeOSCdefsForKeys((
+		currentRule: ev[\makeRules],
+		caSize: ev[\changeSize],
+		linkFFTCa: ev[\makeLinkToFFTCa]
+	));
+	ev.sharedEv.sendAll;
 
-	ev.updateSize = ev.sharedEv.connectTo(ev[\changeSize])
-	.filter({ |object, what, value| what == \caSize })
-	.transform({ |object, what, value| [object.caSize, what, value].postln });
-	OSCdef((prefix ++ "updateCaSize").asSymbol, {
-		{ev.sharedEv.changed(\caSize)}.defer(0.1)
-	}, "/" +/+ prefix +/+ '/caSize').fix;
 
 	// gui
 	ev.gameBlockSize = 40;
@@ -156,6 +160,7 @@
 		\chan, 13,
 		\midinote, 36
 	).asStream;
+	ev.pbindChain = Pbind();
 	ev.spawner = Pspawner({ |sp|
 		var stepEv = ev.evPat.next(());
 		inf.do {
@@ -189,7 +194,7 @@
 				//accumGens.postln;
 				if(accumGens.size > 1){
 					sp.par(
-						Pbind(
+						ev.pbindChain <> Pbind(
 							\dur, stepEv.pulseSpeed,
 							\instrument, \no,
 							\type, \oscMidi,

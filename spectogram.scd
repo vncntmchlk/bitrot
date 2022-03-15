@@ -12,8 +12,8 @@ a = a.shift(-1, 55)
 logₐ(x) = ln(x) / ln(a)
 // spectrogram in a window
 (
-w = Window.new("spectrogram".scramble, Rect(10,10, 60, 300)).front;
-a = Spectrogram2.new(w, Rect(10, 10, 50, 260));
+w = Window.new("spectrogram".scramble, Rect(10,10, 160, 300)).front;
+a = Spectrogram.new(w, Rect(10, 10, 150, 260));
 a.start;
 a.intensity = 50;
 // {SinOsc.ar(MouseY.kr(50,1000))}.play;
@@ -44,3 +44,5 @@ a.intensity = 50;
 // {SinOsc.ar(MouseY.kr(50,1000))}.play;
 {SoundIn.ar([2,3])}.play;
 )
+
+{SoundIn.ar([2,3])}.play;

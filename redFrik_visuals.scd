@@ -13,7 +13,7 @@ s.waitForBoot{
 		SendTrig.ar(trig, 0, bufnum);
 	}).add;
 	SynthDef(\avSnd, {|out= 0, bufnum|
-		var z= PlayBuf.ar(
+		/*var z= PlayBuf.ar(
 			1,
 			bufnum,
 			BufRateScale.ir(bufnum)*LFPulse.kr(0.05, 0, 0.5, 0.2, -1.5),
@@ -21,7 +21,8 @@ s.waitForBoot{
 			BufFrames.ir(bufnum)*LFNoise0.kr(0.2, 0.5, 0.5).round(0.2),
 			1
 		);
-		Out.ar(out, Pan2.ar(z));
+		Out.ar(out, Pan2.ar(z));*/
+		Out.ar(out, SoundIn.ar([2,3]))
 	}).add;
 };
 )
@@ -108,22 +109,29 @@ CmdPeriod.doOnce({if(w.isClosed.not, {w.close})});
 ~sample= 2;
 ~sample= 10;
 ~sample= 1;
-~trails= 0.2;
+~trails= 0.02;
 ~speed= 0.1;
 ~speed= -0.05;
 ~trails= 0.01;
-~amp= 0.02;
+~amp= 0.45;
 ~speed= pi*0.25;
-~amp= 0.2;
+~amp= 2;
 ~sample= 2;
 ~version= 1;
 ~trails= 0.2;
 ~version= 2;
 ~sample= 1;
-~version= 1;
+~version= 2;
 ~speed= 2pi*1.001;
-~amp= 0.5;
+~amp= 1;
 
 //close the window to stop or press cmd+.
 b.free;		//free the waveform buffer
 c.free;		//free the soundfile buffer
+
+//schoen mit SRR
+~trails = 0.02;
+~speed = 0.1;
+~sample = 2;
+~amp = 1;
+~version = 2;
