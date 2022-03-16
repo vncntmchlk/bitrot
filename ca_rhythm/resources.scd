@@ -174,7 +174,7 @@
 	ev.nextLevel = nil!(ev.maxSize + 1);
 	// structure pbind, next event at each step
 	ev.evPat = Pbind(
-		\loopOnOff, true,
+		\loopOnOff, false,
 		\pulseSpeed, Pseq([1/8],inf),
 		\steps, 4,
 		\chan, 13,
@@ -191,7 +191,7 @@
 				loop = stepEv.loopOnOff and: {loopPbind.notNil and: {accumGens.sum > 0}};
 				// "loopGen: ".post; loopGen.postln;
 				if(loop){
-					"looping".postln;
+					//"looping".postln;
 					sp.par(loopPbind);
 					ev.sharedEv.caSize.do { |i|
 						{
@@ -205,7 +205,7 @@
 					loopGen = true;
 					accumGens = [0];
 					durTime = stepEv.pulseSpeed;
-					" notlooping".postln;
+					//" notlooping".postln;
 					ev.gen.myGen.do { |val, ix|
 						if(val.asBoolean){
 							var mixedGen, mixedGenPbind;
@@ -259,11 +259,11 @@
 			};
 
 			if(loopGen){
-				"new gen".postln;
+				//"new gen".postln;
 				ev.lastGen = ev.gen.myGen;
 				ev.gen.nextGen;
 			}{
-				"NO new gen".postln;
+				//"NO new gen".postln;
 			};
 		};
 	});

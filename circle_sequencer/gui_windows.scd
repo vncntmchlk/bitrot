@@ -4,14 +4,38 @@
 ~circles.guiElements.fps = 25;
 ~circles.guiElements.res2 = ~circles.guiElements.resolution * 2;
 
-~circles.guiElements.window = Window("circles", Rect(0, 0, ~circles.guiElements.resolution[1] * 4 + 8, ~circles.guiElements.resolution[0] * 4 + 6));
+~circles.guiElements.window = Window("circles", Rect(0, 0, ~circles.guiElements.resolution[1] * 2 + 8, ~circles.guiElements.resolution[0] * 4 + 6));
 ~circles.guiElements.window.view.background = Color.black;
 ~circles.guiElements.window.front;
 
-~circles.melodieCircle.view = UserView(~circles.guiElements.window, Rect(2, 2, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);
-~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(2, ~circles.guiElements.res2[0] + 4, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);
-/*~chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(~circles.guiElements.res2[1] + 4, 2, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);
-~arpCircle.view = UserView(~circles.guiElements.window, Rect(~circles.guiElements.res2[1] + 4, ~circles.guiElements.res2[0] + 4, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);*/
+~circles.guiElements.notesView = UserView(~circles.guiElements.window,
+	Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100)
+);
+~circles.guiElements.noteImgs = (0..127).collect {|nn|
+	Image.open("/home/vincent/Repos/bitrot/bitrot/pngs" +/+ nn ++ ".png")
+};
+~circles.guiElements.notesHits = Set.new;
+~circles.guiElements.noteHitColor = Color.red(0.5,0.2);
+~circles.guiElements.notesView.drawFunc= {
+	16.do {|ix|
+		var rad = (ix * 22.5 - 180).degrad;
+		var pt = Polar(280, rad).asPoint.translate(
+			(~circles.melodieCircle.view.bounds.width/2 + 15)@(~circles.melodieCircle.view.bounds.height/2 + 25)
+		);
+		~circles.guiElements.noteImgs[~melodie][ix].drawAtPoint(pt);
+		if(~circles.guiElements.notesHits.includes(ix)){
+			Pen.color_(~circles.guiElements.noteHitColor);
+			Pen.addRect(Rect(pt.x, pt.y, 75, 35));
+			Pen.fill
+		}
+	};
+	~circles.guiElements.notesHits.clear;
+};
+
+~circles.melodieCircle.view = UserView(~circles.guiElements.window, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
+~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(50, ~circles.guiElements.res2[0] + 150, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
+/*~circles.melodieCircle.view = UserView(~circles.guiElements.window, Rect(2, 2, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);
+~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(2, ~circles.guiElements.res2[0] + 4, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);*/
 
 ~cues = (
 	list: [
@@ -53,19 +77,23 @@
 //~cues.view.setFont(Font("Hack", 24),0);
 
 ~circles.guiElements.refreshPoints = SkipJack(
-	updateFunc: {~circles.guiElements.window.refresh},
+	// updateFunc: {~circles.guiElements.window.refresh},
+	updateFunc: {
+		~circles.melodieCircle.view.refresh;
+		~circles.chordsBassCircle.view.refresh;
+	},
 	dt: (1 / ~circles.guiElements.fps)
 );
 
 [~circles.melodieCircle, ~circles.chordsBassCircle].do {|instrumentCircle| //~chordsBassCircle, ~arpCircle
 	instrumentCircle.view.drawFunc = {
 		Pen.scale(2,2);
-		Pen.stringAtPoint(instrumentCircle.guiText, 4@5, Font("Hack", 16), Color.black);
+		Pen.stringAtPoint(instrumentCircle.guiText, 4@5, Font("Hack", 16), Color.white);
 		Pen.use {
 			var hits = List.new;
 			instrumentCircle.circs.do { |ci|
 				if(ci.sharedValues.onOff.asBoolean){
-					Pen.color = Color.black();
+					Pen.color = Color.white();
 					Pen.addOval(Rect(
 						~circles.guiElements.offset.x - ci.radius,
 						~circles.guiElements.offset.y - ci.radius,
@@ -91,7 +119,7 @@
 						};
 						Pen.fill;
 					}{
-						Pen.color = Color.black;
+						Pen.color = Color.white;
 						Pen.addRect(
 							Rect(*(
 								Point(ci.radius,0).rotate((ci.testAngle - 180).degrad).translate(~circles.guiElements.offset - 2).asArray  ++ [2, 8]

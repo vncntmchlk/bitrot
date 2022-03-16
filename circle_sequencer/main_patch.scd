@@ -1,18 +1,21 @@
 // rpi starten ssh pi@raspberrypi.local
+
+~mOut = ConnectVirmidi(0); // fuer jetzt zum testen
 (
 "resources.scd".loadRelative;
 "gui_windows.scd".loadRelative;
-"oscDefs.scd".loadRelative;
+//"oscDefs.scd".loadRelative;
 )
-~mOut = ConnectVirmidi(0); // fuer jetzt zum testen
+
 // um video feed zu empfangen
-"python ~/Repos/self-assemblers/rec_images.py".runInTerminal;
+// "python ~/Repos/self-assemblers/rec_images.py".runInTerminal;
 
 /// CIRCLES
 ~rpiAddr.sendMsg("/circles", 1); // on / off befehl fuer die osc msgs vom rpi
 ~rpiAddr.sendMsg("/circles", 0);
 Tdef(\circ0).play(doReset: true, quant: [1,0,-0.025]);
 Tdef(\circ0).stop
+Tdef(\circ0).quant
 /*
 Tdef(\circ0).play(doReset: true, quant: [1,0,-0.025]);
 Tdef(\circ1).play(doReset: true, quant: [1,0,-0.025]);

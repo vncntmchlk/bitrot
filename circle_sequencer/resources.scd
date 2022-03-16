@@ -1,11 +1,11 @@
 // network connection
-thisProcess.openUDPPort(8000); // philipp
-thisProcess.openUDPPort(9000); // receive port from rpi
-thisProcess.openUDPPort(9010); // receive port from open stage control
-~rpiAddr = NetAddr("10.42.0.208", 9001); // send addr to rpi
+// thisProcess.openUDPPort(8000); // philipp
+// thisProcess.openUDPPort(9000); // receive port from rpi
+// thisProcess.openUDPPort(9010); // receive port from open stage control
+// ~rpiAddr = NetAddr("10.42.0.208", 9001); // send addr to rpi
 /*~benniAddr = NetAddr("192.168.1.100", 8000); */// send addr to benni
-~toBenni = NetAddr("192.168.1.104", 8000);
-~localHost = NetAddr("127.0.0.1", 9001);
+// ~toBenni = NetAddr("192.168.1.104", 8000);
+// ~localHost = NetAddr("127.0.0.1", 9001);
 
 ~circles = ();
 
@@ -80,6 +80,20 @@ OSCdef(\resolution, { |msg|
 				Tdef(("circ" ++ circleNum).asSymbol).stop
 			};
 			ev.sharedValues.onOff = onOff;
+		},
+		waitDur: {|newWaitDur|
+			if(ev.sharedValues.onOff.asBoolean){
+				var tdefQuant = ev.sharedValues.waitDur * ev.sharedValues.loopSpeedLevel / 4;
+				Tdef(("circ" ++ circleNum).asSymbol).stop;
+				Tdef(("circ" ++ circleNum).asSymbol).play(TempoClock.default, doReset: true, quant: [tdefQuant,0,-0.025]);
+			}
+		},
+		loopSpeedLevel: {|newSpeed|
+			if(ev.sharedValues.onOff.asBoolean){
+				var tdefQuant = ev.sharedValues.waitDur * ev.sharedValues.loopSpeedLevel / 4;
+				Tdef(("circ" ++ circleNum).asSymbol).stop;
+				Tdef(("circ" ++ circleNum).asSymbol).play(TempoClock.default, doReset: true, quant: [tdefQuant,0,-0.025]);
+			}
 		}
 	));
 	ev.sharedValues.sendAll;
