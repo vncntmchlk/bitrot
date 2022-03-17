@@ -1,0 +1,96 @@
+var o, p;
+o = [
+	Event.prNew,  Array.prNew(16),  Dictionary.prNew,  Array.prNew(28),  
+	Array.prNew(2),  Dictionary.prNew,  Array.prNew(96),  Dictionary.prNew,  
+	Array.prNew(28),  Array.prNew(2),  Dictionary.prNew,  Array.prNew(96)
+];
+p = [
+	// Event
+	0, [ array: o[1],  size: 4,  
+		proto: nil,  parent: nil,  
+		know: true ],  
+	// Array
+	1, [ nil,  nil,  '~gameBitFlip.sharedEv',  o[2],  
+		'~game2.sharedEv',  o[5],  '~gameFFT.sharedEv',  o[7],  
+		nil,  nil,  nil,  nil,  
+		'~game1.sharedEv',  o[10],  nil,  nil ],  
+	// Dictionary
+	2, [ array: o[3],  size: 7 ],  
+	// Array
+	3, [ 'tdefOnOff',  0,  nil,  nil,  
+		nil,  nil,  'sendRate',  2,  
+		'blendSteps',  10,  nil,  nil,  
+		nil,  nil,  'caSize',  16,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'currentRule',  30,  
+		'lastValuesSize',  6,  'caRange',  o[4] ],  
+	// Array
+	4, [ 0,  9 ],  
+	// Dictionary
+	5, [ array: o[6],  size: 24 ],  
+	// Array
+	6, [ 'buttons/13',  0,  'buttons/0',  0,  
+		'caSize',  16,  'buttons/15',  0,  
+		nil,  nil,  'buttons/5',  0,  
+		nil,  nil,  'currentRule',  86,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/4',  0,  'buttons/6',  0,  
+		'pulseSpeed',  8,  'buttons/3',  0,  
+		nil,  nil,  'onOff',  0,  
+		nil,  nil,  'buttons/11',  0,  
+		nil,  nil,  'buttons/9',  0,  
+		'buttons/2',  0,  'buttons/8',  0,  
+		'loopOnOff',  0,  'buttons/10',  0,  
+		'buttons/1',  0,  'linkBitFlip',  0,  
+		'loopEvery',  1,  'buttons/14',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'buttons/12',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/7',  0,  nil,  nil,  
+		nil,  nil,  'linkFFTCa',  0 ],  
+	// Dictionary
+	7, [ array: o[8],  size: 7 ],  
+	// Array
+	8, [ 'tdefOnOff',  0.0,  nil,  nil,  
+		nil,  nil,  'sendRate',  8.0,  
+		'blendSteps',  1,  nil,  nil,  
+		nil,  nil,  'caSize',  16,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'currentRule',  30,  
+		'lastValuesSize',  1,  'caRange',  o[9] ],  
+	// Array
+	9, [ 0,  1 ],  
+	// Dictionary
+	10, [ array: o[11],  size: 24 ],  
+	// Array
+	11, [ 'buttons/13',  0,  'buttons/0',  0,  
+		'caSize',  8,  'buttons/15',  0,  
+		nil,  nil,  'buttons/5',  1.0,  
+		nil,  nil,  'currentRule',  86,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/4',  0,  'buttons/6',  0,  
+		'pulseSpeed',  8,  'buttons/3',  1.0,  
+		nil,  nil,  'onOff',  1.0,  
+		nil,  nil,  'buttons/11',  0,  
+		nil,  nil,  'buttons/9',  0,  
+		'buttons/2',  0,  'buttons/8',  0,  
+		'loopOnOff',  0,  'buttons/10',  0,  
+		'buttons/1',  0,  'linkBitFlip',  0,  
+		'loopEvery',  1,  'buttons/14',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'buttons/12',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/7',  0,  nil,  nil,  
+		nil,  nil,  'linkFFTCa',  1 ]
+];
+prUnarchive(o,p);

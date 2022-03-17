@@ -1,4 +1,4 @@
-~newCaRhythm = { |ev, prefix|
+~newCaRhythm = { |ev, prefix, frontWindow = (false)|
 	// functions and network
 	ev = ();
 	ev.maxSize = 16;
@@ -9,30 +9,43 @@
 	ev.sharedEv.linkFFTCa = 0;
 	ev.sharedEv.linkBitFlip = 0;
 	ev.sharedEv.onOff = 0;
-
+	ev.sharedEv.pulseSpeed = 8;
+	ev.sharedEv.loopOnOff = 0;
+	ev.sharedEv.loopEvery = 1;
+	ev.linkFunc = Pfunc{0};
 	ev.makeLinkToFFTCa = {|onOff|
-		ev.pbindChain = if(onOff.asBoolean){
-			Pbind(\callFunc, Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0})
+		if(onOff.asBoolean){
+			{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
+			ev.linkFunc = Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0};
 		}{
-			Pbind()
+			{~gameFFT.pointerToWindow.visible_(false)}.fork(AppClock);
+			ev.linkFunc = Pfunc{0};
 		};
-		ev.sharedEv.linkFFTCa = onOff; // falls man es manuell aendert aenderung zu osc schickens
 	};
 	ev.makeLinkToBitFlip = {|onOff|
-		ev.pbindChain = if(onOff.asBoolean){
-			Pbind(\callFunc, Pfunc{|ev| if(ev.amp > 0){Pdefn(\bitflipNext).asStream.next};0})
+		if(onOff.asBoolean){
+			{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
+			ev.linkFunc = Pfunc{|ev| if(ev.amp > 0){Pdefn(\bitflipNext).asStream.next};0};
 		}{
-			Pbind()
+			{~gameFFT.pointerToWindow.visible_(false)}.fork(AppClock);
+			ev.linkFunc = Pfunc{0};
 		};
-		ev.sharedEv.linkBitFlip = onOff;
 	};
 
 	ev.buttonStates = 0 ! ev.maxSize;
+	ev.buttonFuncs = ();
 	ev.maxSize.do { |i|
-		OSCdef((prefix ++ 'button' ++ i).asSymbol, { |msg|
-			ev.buttonStates[i] = msg[1].asInteger;
-		},"/" +/+ prefix +/+ "buttons/" ++ i).fix
+		ev.sharedEv[("buttons" +/+ i).asSymbol] = 0;
+		ev.buttonFuncs[("buttons" +/+ i).asSymbol] = { |val|
+			ev.buttonStates[i] = val.asInteger;
+		}
 	};
+
+	/*ev.maxSize.do { |i|
+	OSCdef((prefix ++ 'button' ++ i).asSymbol, { |msg|
+	ev.buttonStates[i] = msg[1].asInteger;
+	},"/" +/+ prefix +/+ "buttons/" ++ i).fix
+	};*/
 	ev.makeRules = { |num|
 		var arr = num.asBinaryDigits.reverse;
 		("rule " ++ num).postln;
@@ -65,38 +78,29 @@
 	};
 
 	ev.changeSize = { |newSize|
-		var oldSize = ev.sharedEv.caSize;
-		if(newSize > ev.sharedEv.caSize){
-			var addZeroes = 0 ! (newSize - ev.sharedEv.caSize);
-			ev.sharedEv.caSize = newSize;
-			(ev.nextLevel ++ [ev.gen]).do {|ca|
-				ca !? {
-					ca.myGen = ca.myGen ++ addZeroes;
-				}
+		(ev.nextLevel ++ [ev.gen]).do {|ca|
+			ca !? {
+				ca.myGen = ca.myGen[..(newSize - 1)];
 			}
-		}{
-			(ev.nextLevel ++ [ev.gen]).do {|ca|
-				ca !? {
-					ca.myGen = ca.myGen[..(newSize - 1)];
-				}
-			};
-			(newSize .. (ev.nextLevel.size - 1)).do {|i|
-				ev.nextLevel[i] = nil;
-			};
-			ev.sharedEv.caSize = newSize;
-			{ev.resizeWin}.defer;
 		};
+		(newSize .. (ev.nextLevel.size - 1)).do {|i|
+			ev.nextLevel[i] = nil;
+		};
+		//ev.sharedEv.caSize = newSize;
+		{ev.resizeWin}.defer(0.1);
 	};
 
 	ev.resizeWin = {
-		ev.win.bounds_(
-			Rect(
-				ev.win.bounds.left,
-				ev.win.bounds.top,
-				ev.sharedEv.caSize * ev.gameBlockCol,
-				ev.sharedEv.caSize * ev.gameBlockRow
+		if(ev.win.isClosed.not){
+			ev.win.bounds_(
+				Rect(
+					ev.win.bounds.left,
+					ev.win.bounds.top,
+					ev.sharedEv.caSize * ev.gameBlockCol,
+					ev.sharedEv.caSize * ev.gameBlockRow
+				)
 			)
-		)
+		}
 	};
 
 	ev[\makeRules].(86);
@@ -110,13 +114,16 @@
 		linkBitFlip: ev[\makeLinkToBitFlip],
 		onOff: {|onOff|
 			if(onOff.asBoolean){
-				Pdef((prefix ++ "spawner").asSymbol).play(quant: 1)
+				Pdef((prefix ++ "spawner").asSymbol).play(quant: 1);
+				{ev.win.visible_(true)}.defer
 			}{
-				Pdef((prefix ++ "spawner").asSymbol).stop
+				Pdef((prefix ++ "spawner").asSymbol).stop;
+				{ev.win.visible_(false)}.defer
 			};
-			ev.sharedEv.onOff = onOff;
+			//ev.sharedEv.onOff = onOff;
 		}
-	));
+	).putAll(ev.buttonFuncs)
+	);
 	ev.sharedEv.sendAll;
 
 
@@ -124,7 +131,10 @@
 	ev.gameBlockSize = 40;
 	ev.gameBlockRow = 40 / 1.61803398875;
 	ev.gameBlockCol = 40;
-	ev.win = Window.new(prefix, bounds:(ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow)).front;
+	ev.win = Window.new(prefix, bounds:(ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow));
+	if(frontWindow){
+		ev.win.front;
+	};
 	ev.view = UserView.new(ev.win, (ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow));
 	ev.view.background_(Color.black);
 	ev.view.clearOnRefresh = false;
@@ -174,13 +184,23 @@
 	ev.nextLevel = nil!(ev.maxSize + 1);
 	// structure pbind, next event at each step
 	ev.evPat = Pbind(
-		\loopOnOff, false,
-		\pulseSpeed, Pseq([1/8],inf),
+		\loopOnOff,  Pn(Plazy{
+			if(ev.sharedEv.loopOnOff.asBoolean){
+				if(ev.sharedEv.loopEvery == 1){
+					Pseq([true])
+				}{
+					Pseq((ev.sharedEv.loopEvery - 1).collect {true} ++ [false])
+				}
+			}{
+				Pseq([false])
+			}
+		}),
+		\pulseSpeed, Pfunc { ev.sharedEv.pulseSpeed.reciprocal },
 		\steps, 4,
 		\chan, 13,
 		\midinote, 36
 	).asStream;
-	ev.pbindChain = Pbind();
+
 	ev.spawner = Pspawner({ |sp|
 		var stepEv = ev.evPat.next(());
 		var loopPbind;
@@ -233,13 +253,15 @@
 					};
 					//accumGens.postln;
 					if(accumGens.size > 1){
-						loopPbind = ev.pbindChain <> Pbind(
-							\dur, stepEv.pulseSpeed,
+						loopPbind = Pbind(
+							\dur, Pfunc { stepEv.pulseSpeed },
 							\instrument, \no,
 							\type, \oscMidi,
-							\amp, Pseq(accumGens / ev.sharedEv.caSize),
-							\chan, stepEv.chan,
-							\midinote, stepEv.midinote,
+							\amp, Plazy{Pseq(accumGens) / ev.sharedEv.caSize},
+							\chan, Pfunc { stepEv.chan },
+							\midinote, Pfunc { stepEv.midinote },
+							// \linkFunc, Pdefn((prefix ++ "link").asSymbol),
+							\linkFunc, Plazy{ev.linkFunc},
 							\netAddr, ~toBenni
 						);
 						sp.par(loopPbind);

@@ -79,18 +79,17 @@ OSCdef(\resolution, { |msg|
 			}{
 				Tdef(("circ" ++ circleNum).asSymbol).stop
 			};
-			ev.sharedValues.onOff = onOff;
 		},
 		waitDur: {|newWaitDur|
 			if(ev.sharedValues.onOff.asBoolean){
-				var tdefQuant = ev.sharedValues.waitDur * ev.sharedValues.loopSpeedLevel / 4;
+				var tdefQuant = newWaitDur * ev.sharedValues.loopSpeedLevel / 4;
 				Tdef(("circ" ++ circleNum).asSymbol).stop;
 				Tdef(("circ" ++ circleNum).asSymbol).play(TempoClock.default, doReset: true, quant: [tdefQuant,0,-0.025]);
 			}
 		},
 		loopSpeedLevel: {|newSpeed|
 			if(ev.sharedValues.onOff.asBoolean){
-				var tdefQuant = ev.sharedValues.waitDur * ev.sharedValues.loopSpeedLevel / 4;
+				var tdefQuant = ev.sharedValues.waitDur * newSpeed / 4;
 				Tdef(("circ" ++ circleNum).asSymbol).stop;
 				Tdef(("circ" ++ circleNum).asSymbol).play(TempoClock.default, doReset: true, quant: [tdefQuant,0,-0.025]);
 			}
@@ -146,7 +145,7 @@ OSCdef(\points,{|msg|
 			[Point(p[0], p[1]).translate(~circles.guiElements.offset * -1).theta.raddeg + 180, Point(p[0], p[1]).dist(~circles.guiElements.offset).round]
 		};
 	};
-	[~circles.melodieCircle, ~circles.chordsBassCircle].do { |instrumentCircle| //~chordsBassCircle, ~arpCircle
+	[~circles.melodieCircle, ~circles.chordsBassCircle].do { |instrumentCircle|
 		if(instrumentCircle.sharedValues.freezeMe.asBoolean.not){
 			instrumentCircle.points = points;
 			instrumentCircle.circs.do {|ci| ci.getIntersections(angles)}

@@ -1,5 +1,4 @@
-
-~caBitFlip = { |initCaSize = 8, initLastValuesSize = 10, startRules = 30|
+~caBitFlip = { |initCaSize = 8, initLastValuesSize = 10, startRules = 30, frontWindow = (false)|
 	var win, game, gameBlockSize = 40;
 	var newCaSize, newLastValuesSize;
 	var prefix = "bitflip";
@@ -13,7 +12,10 @@
 	sharedEv.caRange = [0, 9];
 	sharedEv.tdefOnOff = 0;
 
-	win = Window.new(bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize)).front;
+	win = Window.new(bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
+	if(frontWindow){
+		win.front
+	};
 	win.view.background_(Color.black);
 	win.drawFunc = {
 		var cols = sharedEv.caSize, rows = sharedEv.lastValuesSize;
@@ -45,6 +47,7 @@
 	};
 
 	game = (
+		pointerToWindow: win,
 		sharedEv: sharedEv,
 		lastValues: (0 ! initCaSize) ! initLastValuesSize,
 		saveLastValuesSize: initLastValuesSize,
@@ -52,29 +55,31 @@
 		seedMe: { |self| self.myGen = (0!sharedEv.caSize).put((sharedEv.caSize * 0.5).round, 1)},
 		killSwitch: { |self| self.myGen = (0!sharedEv.caSize)},
 		resizeWindow: { |self|
-			win.bounds_(
-				Rect(
-					win.bounds.left,
-					win.bounds.top,
-					sharedEv.caSize * gameBlockSize,
-					(sharedEv.lastValuesSize + 1) * gameBlockSize
+			if(win.isClosed.not){
+				win.bounds_(
+					Rect(
+						win.bounds.left,
+						win.bounds.top,
+						sharedEv.caSize * gameBlockSize,
+						(sharedEv.lastValuesSize + 1) * gameBlockSize
+					)
 				)
-			)
+			}
 		},
 		// diese beiden funktionen muessen ohne self auskommen damit die connected werden koennen zum sharedEv
 		newCaSize: { |newSize = 8|
-			sharedEv.caSize = newSize;
-			game.lastValues = (0 ! sharedEv.caSize) ! sharedEv.lastValuesSize; // was war kopieren?
-			game.myGen = 0 ! sharedEv.caSize; // das vorhandene kopieren ..
+			// sharedEv.caSize = newSize;
+			game.lastValues = (0 ! newSize) ! sharedEv.lastValuesSize; // was war kopieren?
+			game.myGen = 0 ! newSize; // das vorhandene kopieren ..
 			game.seedMe;
 			game.sumColums; // das ist wahrscheinlich notwendig?
 			game[\onlyShow].(sharedEv.caRange);
 			// resize window ..
-			{game.resizeWindow}.fork(AppClock);
+			{game.resizeWindow}.defer(0.1);
 		},
 		newLastValuesSize: { |newSize = 10|
 			if(newSize != game.saveLastValuesSize){
-				[newSize, game.saveLastValuesSize].postln;
+				// [newSize, game.saveLastValuesSize].postln;
 				if(newSize < game.saveLastValuesSize){
 					game.lastValues = game.lastValues[..(newSize - 1)]
 				}{
@@ -83,10 +88,10 @@
 					)
 				};
 				game.saveLastValuesSize = newSize;
-				sharedEv.lastValuesSize = newSize;
+				// sharedEv.lastValuesSize = newSize;
 				game.sumColums;
 				// resize window ..
-				{game.resizeWindow}.fork(AppClock);
+				{game.resizeWindow}.defer(0.1);
 			}
 		},
 		nextGen: { |self, visualize = true|
@@ -113,7 +118,7 @@
 		makeRules: { |num|
 			var arr = num.asBinaryDigits.reverse;
 			("rule " ++ num).postln;
-			sharedEv.currentRule = num;
+			//sharedEv.currentRule = num;
 			game.rules = (
 				'000': arr[0],
 				'001': arr[1],
@@ -145,11 +150,13 @@
 		caRange: game[\onlyShow],
 		tdefOnOff: {|onOff|
 			if(onOff.asBoolean){
-				Tdef(\bitflip).play(quant: 1)
+				Tdef(\bitflip).play(quant: 1);
+				{win.visible_(true)}.defer
 			}{
-				Tdef(\bitflip).stop
+				Tdef(\bitflip).stop;
+				{win.visible_(false)}.defer
 			};
-			sharedEv.tdefOnOff = onOff;
+			//sharedEv.tdefOnOff = onOff;
 		}
 	));
 	sharedEv.sendAll;

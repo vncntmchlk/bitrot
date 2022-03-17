@@ -11,9 +11,14 @@ thisProcess.openUDPPort(9000); // from rpi
 "../ca_rhythm/resources.scd".loadRelative;
 "resources_ca_fft.scd".loadRelative;
 "resources_ca_bitflip.scd".loadRelative;
+~game1 = ~newCaRhythm.((), prefix: "rhy1");
+~game2 = ~newCaRhythm.((), prefix: "rhy2");
+~gameFFT = ~caFFT.(16, 6);
+~gameBitFlip = ~caBitFlip.(16, 6);
+"manage_presets.scd".loadRelative;
 // circle sequencer
-"../circle_sequencer/resources.scd".loadRelative;
-"../circle_sequencer/gui_windows.scd".loadRelative;
+/*"../circle_sequencer/resources.scd".loadRelative;
+"../circle_sequencer/gui_windows.scd".loadRelative;*/
 )
 //
 ~rpiAddr.sendMsg("/circles", 1); // on / off befehl fuer die osc msgs vom rpi
@@ -21,7 +26,7 @@ thisProcess.openUDPPort(9000); // from rpi
 
 TempoClock.default.tempo = 0.75;
 
-~game1 = ~newCaRhythm.((), prefix: "rhy1");
+~gameFFT.pointerToWindow.visible_(true)
 ~game1.evPat = Pbind(
 	\loopOnOff, Pseq([false, true, true, true], inf),
 	\pulseSpeed, Pseq([1/8],inf),
@@ -39,9 +44,9 @@ TempoClock.default.tempo = 0.75;
 	\chan, 13,
 	\midinote, 36
 ).asStream;
+~game1.pbindChain = Pbind()
 
 
-~game2 = ~newCaRhythm.((), prefix: "rhy2");
 ~game2Player = ~game2.spawner.play(quant: 2);
 ~game2Player.stop
 ~game2.evPat = Pbind(
@@ -54,9 +59,14 @@ TempoClock.default.tempo = 0.75;
 
 
 //die werte sollten am besten so skaliert werden, dass in den mittleren grauen bereichen am meisten aenderung ist
-~gameFFT = ~caFFT.(16, 6);
-
-~gameBitFlip = ~caBitFlip.(16, 6);
 
 
+~gameBitFlip.sharedEv.as(Dictionary).printAll
 
+~presetManager[\savePreset].([
+	"~game1.sharedEv",
+	"~game2.sharedEv",
+	"~gameFFT.sharedEv",
+	"~gameBitFlip.sharedEv"
+], "aaa")
+~presetManager[\loadPreset].("aaa")
