@@ -1,12 +1,12 @@
-~circles.guiElements = ();
+//~circles.guiElements = ();
 ~circles.guiElements.resolution = [ 270, 392 ];
-~circles.guiElements.offset = Point( 196, 135 ); //wird auch fuer rechts benutzt...
+//~circles.guiElements.offset = Point( 196, 135 ); //wird auch fuer rechts benutzt...
 ~circles.guiElements.fps = 25;
 ~circles.guiElements.res2 = ~circles.guiElements.resolution * 2;
 
-~circles.guiElements.window = Window("circles", Rect(0, 0, ~circles.guiElements.resolution[1] * 2 + 8, ~circles.guiElements.resolution[0] * 4 + 6));
+~circles.guiElements.window = Window("circles", Rect(0, 0, ~circles.guiElements.resolution[1] * 4 + 8, ~circles.guiElements.resolution[0] * 3 + 6));
 ~circles.guiElements.window.view.background = Color.black;
-~circles.guiElements.window.front;
+// ~circles.guiElements.window.front;
 
 ~circles.guiElements.notesView = UserView(~circles.guiElements.window,
 	Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100)
@@ -33,56 +33,55 @@
 };
 
 ~circles.melodieCircle.view = UserView(~circles.guiElements.window, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(50, ~circles.guiElements.res2[0] + 150, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-/*~circles.melodieCircle.view = UserView(~circles.guiElements.window, Rect(2, 2, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);
-~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(2, ~circles.guiElements.res2[0] + 4, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white);*/
+~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(50 + ~circles.guiElements.res2[1],0, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
+/*~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(50, ~circles.guiElements.res2[0] + 150, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));*/
 
-~cues = (
-	list: [
-		"Clicks Intro; Resonance voll -> Staccato Akkorde (instr 0)",
-		"Clicks ausdünnen -> Bass (langsam, legato) -> Clicks raus, bass filter auf,Benni schaut: KICK! UND LONG PLUCKS(INSTR 1)! ->bass schneller, Akkorde weniger und zu Legato",
-		"Volle Verzerrung BD und Bass -> BD raus, Bass raus",
-		"Filter auf den Chords -> Arpeggiator (einzeln)",
-		"Plucks sind kurz -> Kick & Bass rein",
-		"Kick dunkel (srr) -> Kick raus, Bass raus",
-		"Arp solo, simpel & durchgängig (Philipp). SLOW Kick rein(INSTR 1!!)",
-		"Vibrato voll -> kick raus; Glide hoch -> Arp Kreise raus bis auf äußeren",
-		"Arp viele noteOns, Klicks kommen rein (10er Quant)",
-		"Phaser, gliss nach oben -> Drums (instr 0 bis auf SNARE, halftime instr 1) dazu (hh erst), Chords dazu (instr 1)",
-		"letzter Arp raus, Clicks ausdünnen; Quant auf 8; Clicks raus, Akkorde pulsig",
-		"bass dazu; Chords werden langsamer; bis Auf chords & kick alle wieder raus (auch bass raus!), chords auf instrument 1 -> auf lange release von chords warten!",
-		"chords wieder schneller für philipp; und wieder langsamer",
-		"chords slow att -> vereinzelt kicks; kicks hören auf, chords hören auf"
-	],
-	view: StaticText(~circles.guiElements.window, Rect(~circles.guiElements.res2[1] + 6, ~circles.guiElements.res2[0] + 4, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white).align_(\topLeft).font_(Font("Hack", 24)),
-	cnt: 0,
-	inc: { |self| self.cnt = self.cnt + 1 },
-	dec: { |self| self.cnt = (self.cnt - 1).clip(0,100)},
-	setCue: {|self|
-		{
-			self.view.string = (
-				"--CUES--\n\nNOW: " ++
-				self.list[self.cnt] ++
-				"\n\n\n\nNEXT: " ++ self.list[self.cnt + 1]);
-		}.defer
-	},
-	nextCue: {|self| self.inc; self.setCue},
-	lastCue: {|self| self.dec; self.setCue}
+/*~cues = (
+list: [
+"Clicks Intro; Resonance voll -> Staccato Akkorde (instr 0)",
+"Clicks ausdünnen -> Bass (langsam, legato) -> Clicks raus, bass filter auf,Benni schaut: KICK! UND LONG PLUCKS(INSTR 1)! ->bass schneller, Akkorde weniger und zu Legato",
+"Volle Verzerrung BD und Bass -> BD raus, Bass raus",
+"Filter auf den Chords -> Arpeggiator (einzeln)",
+"Plucks sind kurz -> Kick & Bass rein",
+"Kick dunkel (srr) -> Kick raus, Bass raus",
+"Arp solo, simpel & durchgängig (Philipp). SLOW Kick rein(INSTR 1!!)",
+"Vibrato voll -> kick raus; Glide hoch -> Arp Kreise raus bis auf äußeren",
+"Arp viele noteOns, Klicks kommen rein (10er Quant)",
+"Phaser, gliss nach oben -> Drums (instr 0 bis auf SNARE, halftime instr 1) dazu (hh erst), Chords dazu (instr 1)",
+"letzter Arp raus, Clicks ausdünnen; Quant auf 8; Clicks raus, Akkorde pulsig",
+"bass dazu; Chords werden langsamer; bis Auf chords & kick alle wieder raus (auch bass raus!), chords auf instrument 1 -> auf lange release von chords warten!",
+"chords wieder schneller für philipp; und wieder langsamer",
+"chords slow att -> vereinzelt kicks; kicks hören auf, chords hören auf"
+],
+view: StaticText(~circles.guiElements.window, Rect(~circles.guiElements.res2[1] + 6, ~circles.guiElements.res2[0] + 4, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.white).align_(\topLeft).font_(Font("Hack", 24)),
+cnt: 0,
+inc: { |self| self.cnt = self.cnt + 1 },
+dec: { |self| self.cnt = (self.cnt - 1).clip(0,100)},
+setCue: {|self|
+{
+self.view.string = (
+"--CUES--\n\nNOW: " ++
+self.list[self.cnt] ++
+"\n\n\n\nNEXT: " ++ self.list[self.cnt + 1]);
+}.defer
+},
+nextCue: {|self| self.inc; self.setCue},
+lastCue: {|self| self.dec; self.setCue}
 );
 ~cues.view.parent.keyDownAction = {|view, char, mod, unicode|
-	if(unicode == 32){~cues.nextCue};
-	if(unicode == 98){~cues.lastCue};
+if(unicode == 32){~cues.nextCue};
+if(unicode == 98){~cues.lastCue};
 };
-~cues.setCue;
-//~cues.view.setFont(Font("Hack", 24),0);
+~cues.setCue;*/
+
 
 ~circles.guiElements.refreshPoints = SkipJack(
-	// updateFunc: {~circles.guiElements.window.refresh},
 	updateFunc: {
 		~circles.melodieCircle.view.refresh;
 		~circles.chordsBassCircle.view.refresh;
 	},
-	dt: (1 / ~circles.guiElements.fps)
+	dt: (1 / ~circles.guiElements.fps),
+	autostart: false
 );
 
 [~circles.melodieCircle, ~circles.chordsBassCircle].do {|instrumentCircle| //~chordsBassCircle, ~arpCircle
@@ -145,3 +144,20 @@
 		};
 	};
 };
+
+~circles.sharedEvAll = OSCSharedEvent.new(netAddr: ~localHost, prefix: "circlesAll");
+~circles.sharedEvAll.onOff = 0;
+~circles.sharedEvAll.makeOSCdefsForKeys((
+	onOff: {|val|
+		if(val.asBoolean){
+			~rpiAddr.sendMsg("/circles", 1);
+			~circles.guiElements.refreshPoints.start;
+			{~circles.guiElements.window.visible_(true)}.defer
+		}{
+			~rpiAddr.sendMsg("/circles", 0);
+			~circles.guiElements.refreshPoints.stop;
+			{~circles.guiElements.window.visible_(false)}.defer
+		}
+	}
+));
+~circles.sharedEvAll.sendAll;

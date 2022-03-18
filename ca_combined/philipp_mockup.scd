@@ -1,16 +1,16 @@
 thisProcess.openUDPPort(9005)
 
 OSCdef(\philippListe, {|msg|
-	msg[1].postln;
-	if(msg[1].size == 16){
+	msg.postln;
+	if(msg[1..].size == 16){
 		~melodie = msg[1..];
 	}
 }, "/liste").fix
 
-~toPhilipp = NetAddr("192.168.0.180", 9004)
+~toPhilipp = NetAddr("192.168.1.102", 9004)
 
 
-~toPhilipp.sendMsg("/index", 0)
+~toPhilipp.sendMsg("/index", 1)
 ~melodie = (60..75)
 
 s.latency = 0.05
@@ -20,7 +20,7 @@ x = Pbind(
 	\midinote, Pfunc{|ev| ~melodie[ev.index] }, //PLseq(\melodie),
 	\amp, PLseq(\rhy),
 	\finish, {|ev|
-		topEnvironment[\toPhilipp].sendMsg("/index", (ev.index + 1).mod(16));
+		topEnvironment[\toPhilipp].sendMsg("/index", (ev.index + 1).mod(16).postln);
 		ev
 	}
 ).play(quant: 2)

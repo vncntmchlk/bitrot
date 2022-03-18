@@ -16,12 +16,8 @@
 OSCdef(\resolution, { |msg|
 	~circles.guiElements.resolution = msg[[1,2]].postln;
 	~circles.guiElements.offset = Point(*msg[[3,4]]).postln;
-	//~offsetRight = Point(*msg[[5,6]]).postln;
 },'/resolution').oneShot;
 
-// ~linkClock = LinkClock.new(1).permanent_(true);
-
-// ~mOut.noteOn(0, 36, 100)
 {
 	var amps = (4: 127, 8: 70, 16: 45);
 	~circles.quantAmps = Env([
@@ -98,7 +94,6 @@ OSCdef(\resolution, { |msg|
 	ev.sharedValues.sendAll;
 
 	Tdef(("circ" ++ circleNum).asSymbol, {
-		//ev.sharedValues.onOff = 1;
 		inf.do {|i|
 			ev.testAngle = i % 360;
 			// bei jedem neuen Durchlauf vom Kreis
@@ -119,7 +114,6 @@ OSCdef(\resolution, { |msg|
 						thisThread.clock.sched(quantCalc - thisThread.beats.mod(quantCalc),{
 							var velocityOfCircle = (i % 90).fold2(45).linlin(0,44,10,127);
 							var velocityOfClock = ~circles.quantAmps[thisThread.beats.mod(4)];
-							//[ev.circleNum, ev.instrumentNum, velocityOfClock].postln;
 							ev.noteFunc(velocityOfClock); // * ev.fadeObj.val
 							nil // wichtig damit nicht nochmal gescheduled wird
 						})
@@ -133,7 +127,7 @@ OSCdef(\resolution, { |msg|
 	ev
 };
 
-["melodie", "chordsBass"].do {|str| // "chordsBass", "arp"
+["melodie", "chordsBass"].do {|str|
 	("instrumentCircles" +/+ str ++ ".scd").loadRelative
 };
 

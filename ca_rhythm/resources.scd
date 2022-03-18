@@ -182,6 +182,7 @@
 	// game spawner
 	ev.gen = ev[\ca].();
 	ev.nextLevel = nil!(ev.maxSize + 1);
+	ev.evPatChan = 13;
 	// structure pbind, next event at each step
 	ev.evPat = Pbind(
 		\loopOnOff,  Pn(Plazy{
@@ -197,7 +198,7 @@
 		}),
 		\pulseSpeed, Pfunc { ev.sharedEv.pulseSpeed.reciprocal },
 		\steps, 4,
-		\chan, 13,
+		\chan, Pfunc{ ev.evPatChan },
 		\midinote, 36
 	).asStream;
 
