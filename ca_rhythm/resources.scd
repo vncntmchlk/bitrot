@@ -140,15 +140,17 @@
 	ev.view.clearOnRefresh = false;
 	ev.drawIndex = 0;
 	ev.hitColor = \red;
+	ev.externalMute = false; // von einem anderen instrument / prozess beeinflusst
 	ev.view.drawFunc = {
-		// ev.drawIndex.postln;
+		var reducedAlpha = if(ev.externalMute){0.1}{1};
 		if(ev.drawIndex == 0){
 			//
 			ev.nextLevel.do { |ca, row|
 				if(ca.notNil){
 					ca.mixedGen.do {|val, col|
 						if(col == 0){
-							Pen.color = Color.perform(ev.hitColor, val);
+							// wird hierdurch nicht hitColor ueberschrieben?
+							Pen.color = Color.perform(ev.hitColor, val).alpha_(reducedAlpha);
 						}{
 							Pen.color = Color.gray(0.5 * val);
 						};
@@ -164,7 +166,7 @@
 				if(ca.notNil){
 					ca.mixedGen.do {|val, col|
 						if(col == ev.drawIndex){
-							Pen.color = Color.perform(ev.hitColor, val);
+							Pen.color = Color.perform(ev.hitColor, val).alpha_(reducedAlpha);
 							Pen.addRect(
 								Rect(col * ev.gameBlockCol, row * ev.gameBlockRow, ev.gameBlockCol, ev.gameBlockRow)
 							);
@@ -258,7 +260,9 @@
 							\dur, Pfunc { stepEv.pulseSpeed },
 							\instrument, \no,
 							\type, \oscMidi,
-							\amp, Plazy{Pseq(accumGens) / ev.sharedEv.caSize},
+							\amp, Plazy{Pseq(accumGens) / ev.sharedEv.caSize} * Pfunc {
+								if(ev.externalMute){0}{1}
+							},
 							\chan, Pfunc { stepEv.chan },
 							\midinote, Pfunc { stepEv.midinote },
 							// \linkFunc, Pdefn((prefix ++ "link").asSymbol),
@@ -291,6 +295,12 @@
 		};
 	});
 	Pdef((prefix ++ "spawner").asSymbol, ev.spawner);
+	Pdefn((prefix ++ "Mute").asSymbol, r {
+		var nextMuteVal = Pseq([false, true], inf).asStream;
+		loop{
+			ev.externalMute = nextMuteVal.next;
+			0.yield;
+	}})
 
 	ev
 };

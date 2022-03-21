@@ -1,91 +1,139 @@
-~circles.circleArray[0] = ~circles[\makeAngle].(radius: 60, circleNum: 0, instrumentNum: 0, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0,1,1));
-~circles.circleArray[1] = ~circles[\makeAngle].(radius: 90, circleNum: 1, instrumentNum: 0, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0.1,1,1));
-~circles.circleArray[2] = ~circles[\makeAngle].(radius: 120, circleNum: 2, instrumentNum: 0, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0.9,1,1));
-
-~melodie = (60..75);
+~circles.circleArray[0] = ~circles[\makeAngle].(radius: 60, circleNum: 0, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0,1,1));
+~circles.circleArray[1] = ~circles[\makeAngle].(radius: 90, circleNum: 1, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0.1,1,1));
+~circles.circleArray[2] = ~circles[\makeAngle].(radius: 120, circleNum: 2, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0.9,1,1));
 
 ~circles.melodieCircle = (
 	circs: ~circles.circleArray[0..2],
 	sharedValues: OSCSharedEvent.new(netAddr: ~localHost, prefix: "melodie"),
 	points: [],
+	instrumentName: "notes0",
+	instrumentChan: 0,
 	guiText: "MELODIE"
 );
+
+~circles.melodieCircle.noteArray = (60..75);
+OSCdef(\philippMelody, {|msg|
+	// msg.postln;
+	if(msg[1..].size == 16){
+		~circles.melodieCircle.noteArray = msg[1..];
+	}
+}, "/melodyList").fix;
+
+~circles.circleArray[0..2].do {|ev|
+	ev.sendIndexFunc = { |self, schedCalc|
+		//var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
+		//var taktStufe = thisThread.beats.mod(totalTaktDur / 4);
+		var indexDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16 / 4;
+		var index = self.testAngle.linlin(0, 359, 0, 15.999).round(1); // sollte besser sein?
+		var retIndex = nil;
+		[index, indexDur, schedCalc].postln;
+		/*var index = ((
+		(taktStufe / (totalTaktDur)) * 4
+		) * 15.999);//.asInteger;//.round.clip(0,15);
+		if(totalTaktDur < 16){
+		index = index.asInteger
+		}{
+		index = index.round.clip(0,15);
+		};*/
+		if(~circles.melodieCircle.blockedIndices.includes(index).not){
+			~toPhilipp.sendMsg("/melodyIndex", index);
+			retIndex = index;
+			//ev.noteFunc(vel, index)
+			/*thisThread.clock.sched(
+				indexDur - self.lookAheadTime,
+				{ev.noteFunc(vel, index); nil}
+			)*/
+		};
+		~circles.melodieCircle.blockedIndices.add(index);
+		thisThread.clock.sched(
+			indexDur + 0.01,
+			{~circles.melodieCircle.blockedIndices.remove(index); nil}
+		);
+		retIndex
+	}
+};
 
 ~circles.melodieCircle.blockedIndices = Set.new();
 
 // variante 2 mit note drawing
 ~circles.melodieCircle.monoNoteFunc = {
 	~circles.circleArray[0..2].do {|ev|
-		ev.noteFunc = { |self, vel|
-			var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
+		ev.noteFunc = { |self, vel, index|
+			/*var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
 			var taktStufe = thisThread.beats.mod(totalTaktDur / 4);
 			var index = ((
-				(taktStufe / (totalTaktDur)) * 4
+			(taktStufe / (totalTaktDur)) * 4
 			) * 15.999);//.asInteger;//.round.clip(0,15);
 			if(totalTaktDur < 16){
-				index = index.asInteger
+			index = index.asInteger
 			}{
-				index = index.round.clip(0,15);
-			};
-			if(~circles.melodieCircle.blockedIndices.includes(index).not){
-				~toPhilipp.sendMsg("/melodyIndex", index);
-				if(~circles.lastMelodieNote != ~melodie[index]){
-					if(~circles.lastMelodieNote.notNil){
-						//~mOut.noteOff(0, ~circles.lastMelodieNote);
-						~toBenni.sendMsg("notes0", ~circles.lastMelodieNote, 0);
-					};
-					~circles.guiElements.notesHits.add(index);
-					{
-						~circles.guiElements.noteHitColor = ev.guiColor.copy.alpha_(0.3);
-						~circles.guiElements.notesView.refresh
-					}.fork(AppClock);
-					//~mOut.noteOn(0, ~melodie[index], 70);
-					~toBenni.sendMsg("notes0", ~melodie[index], vel);
-					~circles.lastMelodieNote = ~melodie[index];
+			index = index.round.clip(0,15);
+			};*/
+			//if(~circles.melodieCircle.blockedIndices.includes(index).not){
+			// ~toPhilipp.sendMsg("/melodyIndex", index);
+			if(~circles.melodieCircle.lastNote != ~circles.melodieCircle.noteArray[index]){
+				if(~circles.melodieCircle.lastNote.notNil){
+					//~mOut.noteOff(0, ~circles.melodieCircle.lastNote);
+					~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.lastNote, 0);
+				};
+				~circles.guiElements.notesHits.add(index);
+				{
+					~circles.guiElements.noteHitColor = ev.guiColor.copy.alpha_(0.3);
+					~circles.guiElements.notesView.refresh
+				}.fork(AppClock);
+				//~mOut.noteOn(0, ~melodie[index], 70);
+				~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.noteArray[index], vel);
+				~circles.melodieCircle.lastNote = ~circles.melodieCircle.noteArray[index];
+				if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
+					Pdefn(\rhy1Mute).asStream.next
 				};
 			};
-			~circles.melodieCircle.blockedIndices.add(index);
+			// };
+			/*			~circles.melodieCircle.blockedIndices.add(index);
 			thisThread.clock.sched(self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16, {
-				~circles.melodieCircle.blockedIndices.remove(index); nil
-			});
+			~circles.melodieCircle.blockedIndices.remove(index); nil
+			});*/
 		}
 	};
 };
 ~circles.melodieCircle.noteFunc = {
 	~circles.circleArray[0..2].do {|ev, circleIndex|
-		ev.noteFunc = { |self, vel|
-			var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
+		ev.noteFunc = { |self, vel, index|
+			var offsetMidinote = [-12, 0, 12][circleIndex];
+			/*var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
 			var taktStufe = thisThread.beats
 			.mod(totalTaktDur / 4);
 			var index = ((
-				(taktStufe / (totalTaktDur)) * 4
-			) * 15.999);//.asInteger;//.round.clip(0,15);
-			var offsetMidinote = [-12, 0, 12][circleIndex];
-			if(totalTaktDur < 16){
-				index = index.asInteger
+			(taktStufe / (totalTaktDur)) * 4
+			) * 15.999);*/
+			/*if(totalTaktDur < 16){
+			index = index.asInteger
 			}{
-				index = index.round.clip(0,15);
+			index = index.round.clip(0,15);
+			};*/
+			// if(~circles.melodieCircle.blockedIndices.includes(index).not){
+			// ~toPhilipp.sendMsg("/melodyIndex", index);
+			{
+				~circles.guiElements.notesHits.add(index);
+				~circles.guiElements.noteHitColor = ev.guiColor.copy.alpha_(0.3);
+				~circles.guiElements.notesView.refresh
+			}.fork(AppClock);
+			if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
+				Pdefn(\rhy1Mute).asStream.next
 			};
-			if(~circles.melodieCircle.blockedIndices.includes(index).not){
-				~toPhilipp.sendMsg("/melodyIndex", index);
-				{
-					~circles.guiElements.notesHits.add(index);
-					~circles.guiElements.noteHitColor = ev.guiColor.copy.alpha_(0.3);
-					~circles.guiElements.notesView.refresh
-				}.fork(AppClock);
-				(
-					midinote: ~melodie[index] + offsetMidinote,
-					dur: self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 4,
-					legato: self.sharedValues.circleLegato,
-					type: \oscMidi,
-					chan: 0,
-					netAddr: ~toBenni
-				).play
-			};
+			(
+				midinote: ~circles.melodieCircle.noteArray[index] + offsetMidinote,
+				dur: self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 4,
+				legato: self.sharedValues.circleLegato,
+				type: \oscMidi,
+				chan: ~circles.melodieCircle.instrumentChan,
+				netAddr: ~toBenni
+			).play
+			/*			};
 			~circles.melodieCircle.blockedIndices.add(index);
 			thisThread.clock.sched(self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16, {
-				~circles.melodieCircle.blockedIndices.remove(index); nil
-			});
+			~circles.melodieCircle.blockedIndices.remove(index); nil
+			});*/
 		}
 	};
 };
@@ -94,12 +142,33 @@
 
 ~circles.melodieCircle.sharedValues.freezeMe = true;
 ~circles.melodieCircle.sharedValues.monoMode = 1;
+~circles.melodieCircle.sharedValues.linkToRhy1Mute = 0;
+~circles.melodieCircle.sharedValues.onOff = 0;
 ~circles.melodieCircle.sharedValues.makeOSCdefsForKeys((
 	monoMode: { |val|
 		if(val.asBoolean){
 			~circles.melodieCircle.monoNoteFunc.();
 		}{
 			~circles.melodieCircle.noteFunc.();
+			if(~circles.melodieCircle.lastNote.notNil){
+				~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.lastNote, 0);
+				~circles.melodieCircle.lastNote = nil;
+			};
+		}
+	},
+	onOff: {|val|
+		if(val.asBoolean){
+			// ~circles.guiElements.refreshPointsMelodie.start;
+			~circles.guiElements.melodieRefreshPoints.start;
+			{~circles.guiElements.melodieWindow.visible_(true)}.defer
+		}{
+			// ~circles.guiElements.refreshPointsMelodie.stop;
+			~circles.guiElements.melodieRefreshPoints.stop;
+			if(~circles.melodieCircle.lastNote.notNil){
+				~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.lastNote, 0);
+				~circles.melodieCircle.lastNote = nil;
+			};
+			{~circles.guiElements.melodieWindow.visible_(false)}.defer
 		}
 	}
 ));

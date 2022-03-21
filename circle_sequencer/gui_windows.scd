@@ -4,11 +4,22 @@
 ~circles.guiElements.fps = 25;
 ~circles.guiElements.res2 = ~circles.guiElements.resolution * 2;
 
-~circles.guiElements.window = Window("circles", Rect(0, 0, ~circles.guiElements.resolution[1] * 4 + 8, ~circles.guiElements.resolution[0] * 3 + 6));
-~circles.guiElements.window.view.background = Color.black;
-// ~circles.guiElements.window.front;
+["melodie", "bass", "chords"].do { |name|
+	var sym = (name ++ "Window").asSymbol;
+	var symCircle = (name ++ "Circle").asSymbol;
+	var symRefreshPoints = (name ++ "RefreshPoints").asSymbol;
+	~circles.guiElements[sym] = Window(name, Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
+	~circles.guiElements[sym].view.background = Color.black;
+	~circles[symCircle].view = UserView(~circles.guiElements[sym], Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
 
-~circles.guiElements.notesView = UserView(~circles.guiElements.window,
+	~circles.guiElements[symRefreshPoints] = SkipJack(
+		updateFunc: {~circles[symCircle].view.refresh},
+		dt: (1 / ~circles.guiElements.fps),
+		autostart: false
+	);
+};
+
+~circles.guiElements.notesView = UserView(~circles.guiElements.melodieWindow,
 	Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100)
 );
 ~circles.guiElements.noteImgs = (0..127).collect {|nn|
@@ -22,7 +33,7 @@
 		var pt = Polar(280, rad).asPoint.translate(
 			(~circles.melodieCircle.view.bounds.width/2 + 15)@(~circles.melodieCircle.view.bounds.height/2 + 25)
 		);
-		~circles.guiElements.noteImgs[~melodie][ix].drawAtPoint(pt);
+		~circles.guiElements.noteImgs[~circles.melodieCircle.noteArray][ix].drawAtPoint(pt);
 		if(~circles.guiElements.notesHits.includes(ix)){
 			Pen.color_(~circles.guiElements.noteHitColor);
 			Pen.addRect(Rect(pt.x, pt.y, 75, 35));
@@ -32,9 +43,23 @@
 	~circles.guiElements.notesHits.clear;
 };
 
-~circles.melodieCircle.view = UserView(~circles.guiElements.window, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(50 + ~circles.guiElements.res2[1],0, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-/*~circles.chordsBassCircle.view = UserView(~circles.guiElements.window, Rect(50, ~circles.guiElements.res2[0] + 150, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));*/
+/*~circles.guiElements.melodieWindow = Window("melodie", Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
+~circles.guiElements.melodieWindow.view.background = Color.black;
+// ~circles.guiElements.melodieWindow.front;
+
+~circles.guiElements.bassWindow = Window("bass", Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
+~circles.guiElements.bassWindow.view.background = Color.black;
+
+~circles.guiElements.chordsWindow = Window("chords", Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
+~circles.guiElements.chordsWindow.view.background = Color.black;
+
+~circles.melodieCircle.view = UserView(~circles.guiElements.melodieWindow, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
+~circles.bassCircle.view = UserView(~circles.guiElements.bassWindow, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
+~circles.chordsCircle.view = UserView(~circles.guiElements.bassWindow, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));*/
+
+
+
+
 
 /*~cues = (
 list: [
@@ -75,16 +100,8 @@ if(unicode == 98){~cues.lastCue};
 ~cues.setCue;*/
 
 
-~circles.guiElements.refreshPoints = SkipJack(
-	updateFunc: {
-		~circles.melodieCircle.view.refresh;
-		~circles.chordsBassCircle.view.refresh;
-	},
-	dt: (1 / ~circles.guiElements.fps),
-	autostart: false
-);
 
-[~circles.melodieCircle, ~circles.chordsBassCircle].do {|instrumentCircle| //~chordsBassCircle, ~arpCircle
+[~circles.melodieCircle, ~circles.bassCircle, ~circles.chordsCircle].do {|instrumentCircle| //~chordsBassCircle, ~arpCircle
 	instrumentCircle.view.drawFunc = {
 		Pen.scale(2,2);
 		Pen.stringAtPoint(instrumentCircle.guiText, 4@5, Font("Hack", 16), Color.white);
@@ -145,19 +162,20 @@ if(unicode == 98){~cues.lastCue};
 	};
 };
 
-~circles.sharedEvAll = OSCSharedEvent.new(netAddr: ~localHost, prefix: "circlesAll");
+//besser dass rpi immer sendet
+/*~circles.sharedEvAll = OSCSharedEvent.new(netAddr: ~localHost, prefix: "circlesAll");
 ~circles.sharedEvAll.onOff = 0;
 ~circles.sharedEvAll.makeOSCdefsForKeys((
-	onOff: {|val|
-		if(val.asBoolean){
-			~rpiAddr.sendMsg("/circles", 1);
-			~circles.guiElements.refreshPoints.start;
-			{~circles.guiElements.window.visible_(true)}.defer
-		}{
-			~rpiAddr.sendMsg("/circles", 0);
-			~circles.guiElements.refreshPoints.stop;
-			{~circles.guiElements.window.visible_(false)}.defer
-		}
-	}
+onOff: {|val|
+if(val.asBoolean){
+~rpiAddr.sendMsg("/circles", 1);
+~circles.guiElements.refreshPoints.start;
+{~circles.guiElements.melodieWindow.visible_(true)}.defer
+}{
+~rpiAddr.sendMsg("/circles", 0);
+~circles.guiElements.refreshPoints.stop;
+{~circles.guiElements.melodieWindow.visible_(false)}.defer
+}
+}
 ));
-~circles.sharedEvAll.sendAll;
+~circles.sharedEvAll.sendAll;*/

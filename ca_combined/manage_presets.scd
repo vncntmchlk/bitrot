@@ -14,6 +14,18 @@
 				(str ++ "['" ++ k ++ "'] = " ++ v).interpret
 			}
 		}
+	},
+	showPresetDifference: {|name = "test"|
+		var preset = Object.readArchive(~presetManager.presetPath +/+ name ++ ".preset");
+		preset.keysValuesDo {|str, ev|
+			ev.pairsDo {|k, v|
+				var currentVal = (str ++ "['" ++ k ++ "']").interpret;
+				if(currentVal != v){
+					(str ++ "." ++ k).postln;
+					("" ++ currentVal ++ " --> " ++ v).postln;
+				}
+			}
+		}
 	}
 );
 

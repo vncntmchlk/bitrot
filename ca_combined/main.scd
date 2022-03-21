@@ -5,12 +5,6 @@
 // vm -> benni
 // vm -> philipp, philipp -> vm
 
-// zu philipp nur einmal pro index schicken (und zu benni auch?)
-// chords und bass kreis, damit man alle separat einfrieren kann
-// damit philipp direkt die noten aendern kann:
-// zuerst wird ihm der index geschickt
-// einen index spaeter wird der abgespielt (offset von abspielen und auslesen)
-
 // formteile
 // atmo, durch ca geschmeidig geaendert
 // aenderung wird ruckartig
@@ -18,7 +12,6 @@
 // dann atmo raus
 
 // drums mit delay und grains, tempo geht auch sehr schnell
-
 
 
 (
@@ -30,20 +23,6 @@ thisProcess.openUDPPort(9005); // from philipp
 ~localHost = NetAddr("127.0.0.1", 9001); // to open stage control
 ~rpiAddr = NetAddr("10.42.0.208", 9001);
 ~toPhilipp = NetAddr("192.168.1.102", 9004);
-OSCdef(\philippMelody, {|msg|
-	// msg.postln;
-	if(msg[1..].size == 16){
-		~melodie = msg[1..];
-	}
-}, "/melodyList").fix;
-
-OSCdef(\philippBassLine, {|msg|
-	// msg.postln;
-	if(msg[1..].size == 16){
-		~bassLine = msg[1..];
-	}
-}, "/bassList").fix;
-
 // ~rpiAddr = NetAddr("169.254.167.159", 9001);
 "../oscMidiEvent.scd".loadRelative;
 "../ca_rhythm/resources.scd".loadRelative;
@@ -57,7 +36,18 @@ OSCdef(\philippBassLine, {|msg|
 // circle sequencer
 "../circle_sequencer/resources.scd".loadRelative;
 "../circle_sequencer/gui_windows.scd".loadRelative;
+~rpiAddr.sendMsg("/circles", 1);
 )
+
+
+// um aktuelle window konfiguration zu kriegen:
+~circles.guiElements.melodieWindow.bounds.origin;
+~circles.guiElements.bassWindow.bounds.origin;
+~circles.guiElements.chordsWindow.bounds.origin;
+// USW
+
+~rpiAddr.sendMsg("/circles", 0);
+~rpiAddr.sendMsg("/circles", 1);
 
 ~toBenni.sendMsg("/clips", 0)
 ~toBenni.sendMsg("/bitrotData", "fftBinsGain", *(0!6)) // -70 - 70 gain fuer jeweiliges Band
@@ -84,3 +74,6 @@ TempoClock.default.tempo = 1;
 	"~gameBitFlip.sharedEv"
 ], "aaa")
 ~presetManager[\loadPreset].("aaa")
+
+~presetManager[\showPresetDifference].("aaa")
+

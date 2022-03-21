@@ -171,6 +171,11 @@
 		if(msg[1].asBoolean){game.killSwitch}
 	},"/" +/+ prefix +/+ "killSwitch").fix;
 
+	// send 0 dB for all bands
+	OSCdef((prefix ++ 'set_0_dB').asSymbol, { |msg|
+		~toBenni.sendMsg("/bitrotData", "fftBinsGain", *[0, 0, 0, 0, 0, 0]);
+	},"/" +/+ prefix +/+ "set_0_dB").fix;
+
 	game
 };
 

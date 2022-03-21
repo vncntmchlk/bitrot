@@ -52,11 +52,16 @@ OSCdef(\resolution, { |msg|
 		circumference: radius * 2,
 		circleNum: circleNum,
 		testAngle: 0,
+		testAngleLookAhead: 0,
 		guiHit: 0,
 		guiColor: guiColor,
 		arpCounter: 0,
 		muteNow: false,
 		muteCount: 0,
+		//muteNowLookAhead: false,
+		//muteCountLookAhead: false,
+		lookAheadTime: 0.02, // nicht groesser als 0.03125 (self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16)
+		// wird durch tempoclock aenderungen noch ein andere wert rauskommen
 		getIntersections: { |self, angles| self.intersections = angles.select{|ang| ang[1] == self.radius} }
 	);
 	ev.sharedValues.fade = 0;
@@ -95,7 +100,16 @@ OSCdef(\resolution, { |msg|
 
 	Tdef(("circ" ++ circleNum).asSymbol, {
 		inf.do {|i|
+			var waitRate = (ev.sharedValues.waitDur * ev.sharedValues.loopSpeedLevel / 1440);
+			var lookAheadIndex = (ev.lookAheadTime / waitRate).asInteger.clip(1, 359);
+			// waitDur minimum = 1, loopSpeed = 0.5
+			// ziel: 0.02 sek vorher zu philipp schicken
+			// ev.testAngleLookAhead = (i + lookAheadIndex) % 360;
+			// es wird immer ca. 0.02 sekunden vorher geschaut (tempoclock aenderungen koennten einfluss haben?)
+			// der index wird direkt zu philipp geschickt, die notefunc mit der entsprechenden verzoegerung gefeuert
+			// (berechnet aus dauer eines taktIndexes (gesamt taktdauer / 16) minus look ahead time
 			ev.testAngle = i % 360;
+			// ev.testAngleLookAhead = (i + lookAheadIndex) % 360;
 			// bei jedem neuen Durchlauf vom Kreis
 			if(ev.testAngle == 0){
 				if(ev.sharedValues.muteEveryX > 0){
@@ -110,24 +124,29 @@ OSCdef(\resolution, { |msg|
 				ev.intersections.do { |ang, ix|
 					if(ang[0].asInteger == ev.testAngle){
 						var quantCalc = 1 / ev.sharedValues.quantVal;
-						ev.guiHit = 24; // koennte anhand der velocity skalieren
-						thisThread.clock.sched(quantCalc - thisThread.beats.mod(quantCalc),{
-							var velocityOfCircle = (i % 90).fold2(45).linlin(0,44,10,127);
-							var velocityOfClock = ~circles.quantAmps[thisThread.beats.mod(4)];
-							ev.noteFunc(velocityOfClock); // * ev.fadeObj.val
-							nil // wichtig damit nicht nochmal gescheduled wird
-						})
+						var schedCalc = quantCalc - thisThread.beats.mod(quantCalc);
+						var retIndex = ev.sendIndexFunc(schedCalc);
+						if(retIndex.notNil){
+							ev.guiHit = 24;
+							// hier evtl ein minimum fuer schedCalc einfuegen damit philipp auf jeden fall zum zuge kommt
+							// mach dann mal bench bei ihm um zu sehen ob seine response funktion nicht zu langsam ist ...
+							thisThread.clock.sched(schedCalc,{
+								var velocityOfCircle = (i % 90).fold2(45).linlin(0,44,10,127);
+								var velocityOfClock = ~circles.quantAmps[thisThread.beats.mod(4)];
+								ev.noteFunc(velocityOfClock, retIndex); // * ev.fadeObj.val
+								nil // wichtig damit nicht nochmal gescheduled wird
+							})
+						};
 					}
 				}
 			};
-			(ev.sharedValues.waitDur * ev.sharedValues.loopSpeedLevel / 1440).wait;
+			waitRate.wait;
 		}
 	});
-
 	ev
 };
 
-["melodie", "chordsBass"].do {|str|
+["melodie", "bass", "chords"].do {|str|
 	("instrumentCircles" +/+ str ++ ".scd").loadRelative
 };
 
@@ -139,7 +158,7 @@ OSCdef(\points,{|msg|
 			[Point(p[0], p[1]).translate(~circles.guiElements.offset * -1).theta.raddeg + 180, Point(p[0], p[1]).dist(~circles.guiElements.offset).round]
 		};
 	};
-	[~circles.melodieCircle, ~circles.chordsBassCircle].do { |instrumentCircle|
+	[~circles.melodieCircle, ~circles.bassCircle, ~circles.chordsCircle].do { |instrumentCircle|
 		if(instrumentCircle.sharedValues.freezeMe.asBoolean.not){
 			instrumentCircle.points = points;
 			instrumentCircle.circs.do {|ci| ci.getIntersections(angles)}
