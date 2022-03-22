@@ -300,7 +300,7 @@
 		loop{
 			ev.externalMute = nextMuteVal.next;
 			0.yield;
-	}})
+	}});
 
 	ev
 };

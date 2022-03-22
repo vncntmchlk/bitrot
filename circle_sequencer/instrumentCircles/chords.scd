@@ -1,7 +1,7 @@
 // clicks
-~circles.circleArray[3] = ~circles[\makeAngle].(radius: 60, circleNum: 3, waitDur: 8, quantVal: 10, guiColor: Color.hsv(0.8,1,1));
-~circles.circleArray[4] = ~circles[\makeAngle].(radius: 90, circleNum: 4, waitDur: 8, quantVal: 10, guiColor: Color.hsv(0.7,1,1));
-~circles.circleArray[5] = ~circles[\makeAngle].(radius: 120, circleNum: 5, waitDur: 8, quantVal: 10, guiColor: Color.hsv(0.6,1,1));
+~circles.circleArray[3] = ~circles[\makeAngle].(radius: 60, circleNum: 3, waitDur: 8, guiColor: Color.hsv(0.8,1,1));
+~circles.circleArray[4] = ~circles[\makeAngle].(radius: 90, circleNum: 4, waitDur: 8, guiColor: Color.hsv(0.7,1,1));
+~circles.circleArray[5] = ~circles[\makeAngle].(radius: 120, circleNum: 5, waitDur: 8, guiColor: Color.hsv(0.6,1,1));
 ~circles.circleArray[3..5].do {|ev|
 	ev.noteFunc = { |self, arr|
 		//~toBenni.sendMsg("/circleNumber", self.circleNum, self.sharedValues.instrumentNum, vel);
@@ -20,28 +20,21 @@
 );
 
 ~circles.chordsCircle[3..5].do {|ev|
-	ev.sendIndexFunc = { |self, vel|
-		var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
-		var taktStufe = thisThread.beats.mod(totalTaktDur / 4);
-		var index = ((
-			(taktStufe / (totalTaktDur)) * 4
-		) * 15.999);//.asInteger;//.round.clip(0,15);
-		if(totalTaktDur < 16){
-			index = index.asInteger
-		}{
-			index = index.round.clip(0,15);
+	ev.sendIndexFunc = { |self, schedCalc|
+		var indexDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16 / 4;
+		var index = self.testAngle.linlin(0, 359, 0, 15.999).round(1); // sollte besser sein?
+		var retIndex = nil;
+		[index, indexDur, schedCalc].postln;
+		if(~circles.melodieCircle.blockedIndices.includes(index).not){
+			~toPhilipp.sendMsg("/melodyIndex", index);
+			retIndex = index;
 		};
-		if(~circles.chordsCircle.blockedIndices.includes(index).not){
-			~toPhilipp.sendMsg("/chordsIndex", index);
-			thisThread.clock.sched(self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16 - self.lookAheadTime, {
-				ev.noteFunc(vel, index);
-				nil
-			})
-		};
-		~circles.chordsCircle.blockedIndices.add(index);
-		thisThread.clock.sched(self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16, {
-			~circles.chordsCircle.blockedIndices.remove(index); nil
-		});
+		~circles.melodieCircle.blockedIndices.add(index);
+		thisThread.clock.sched(
+			indexDur + 0.01,
+			{~circles.melodieCircle.blockedIndices.remove(index); nil}
+		);
+		retIndex
 	}
 };
 

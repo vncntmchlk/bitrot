@@ -1,6 +1,6 @@
-~circles.circleArray[0] = ~circles[\makeAngle].(radius: 60, circleNum: 0, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0,1,1));
-~circles.circleArray[1] = ~circles[\makeAngle].(radius: 90, circleNum: 1, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0.1,1,1));
-~circles.circleArray[2] = ~circles[\makeAngle].(radius: 120, circleNum: 2, waitDur: 8, quantVal: 8, guiColor: Color.hsv(0.9,1,1));
+~circles.circleArray[0] = ~circles[\makeAngle].(radius: 60, circleNum: 0, waitDur: 8, guiColor: Color.hsv(0,1,1));
+~circles.circleArray[1] = ~circles[\makeAngle].(radius: 90, circleNum: 1, waitDur: 8, guiColor: Color.hsv(0.1,1,1));
+~circles.circleArray[2] = ~circles[\makeAngle].(radius: 120, circleNum: 2, waitDur: 8, guiColor: Color.hsv(0.9,1,1));
 
 ~circles.melodieCircle = (
 	circs: ~circles.circleArray[0..2],
@@ -20,36 +20,8 @@ OSCdef(\philippMelody, {|msg|
 }, "/melodyList").fix;
 
 ~circles.circleArray[0..2].do {|ev|
-	ev.sendIndexFunc = { |self, schedCalc|
-		//var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
-		//var taktStufe = thisThread.beats.mod(totalTaktDur / 4);
-		var indexDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16 / 4;
-		var index = self.testAngle.linlin(0, 359, 0, 15.999).round(1); // sollte besser sein?
-		var retIndex = nil;
-		[index, indexDur, schedCalc].postln;
-		/*var index = ((
-		(taktStufe / (totalTaktDur)) * 4
-		) * 15.999);//.asInteger;//.round.clip(0,15);
-		if(totalTaktDur < 16){
-		index = index.asInteger
-		}{
-		index = index.round.clip(0,15);
-		};*/
-		if(~circles.melodieCircle.blockedIndices.includes(index).not){
-			~toPhilipp.sendMsg("/melodyIndex", index);
-			retIndex = index;
-			//ev.noteFunc(vel, index)
-			/*thisThread.clock.sched(
-				indexDur - self.lookAheadTime,
-				{ev.noteFunc(vel, index); nil}
-			)*/
-		};
-		~circles.melodieCircle.blockedIndices.add(index);
-		thisThread.clock.sched(
-			indexDur + 0.01,
-			{~circles.melodieCircle.blockedIndices.remove(index); nil}
-		);
-		retIndex
+	ev.sendIndexFunc = { |self, index|
+		~toPhilipp.sendMsg("/melodyIndex", index);
 	}
 };
 
@@ -59,18 +31,6 @@ OSCdef(\philippMelody, {|msg|
 ~circles.melodieCircle.monoNoteFunc = {
 	~circles.circleArray[0..2].do {|ev|
 		ev.noteFunc = { |self, vel, index|
-			/*var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
-			var taktStufe = thisThread.beats.mod(totalTaktDur / 4);
-			var index = ((
-			(taktStufe / (totalTaktDur)) * 4
-			) * 15.999);//.asInteger;//.round.clip(0,15);
-			if(totalTaktDur < 16){
-			index = index.asInteger
-			}{
-			index = index.round.clip(0,15);
-			};*/
-			//if(~circles.melodieCircle.blockedIndices.includes(index).not){
-			// ~toPhilipp.sendMsg("/melodyIndex", index);
 			if(~circles.melodieCircle.lastNote != ~circles.melodieCircle.noteArray[index]){
 				if(~circles.melodieCircle.lastNote.notNil){
 					//~mOut.noteOff(0, ~circles.melodieCircle.lastNote);
@@ -88,11 +48,6 @@ OSCdef(\philippMelody, {|msg|
 					Pdefn(\rhy1Mute).asStream.next
 				};
 			};
-			// };
-			/*			~circles.melodieCircle.blockedIndices.add(index);
-			thisThread.clock.sched(self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16, {
-			~circles.melodieCircle.blockedIndices.remove(index); nil
-			});*/
 		}
 	};
 };
@@ -100,19 +55,6 @@ OSCdef(\philippMelody, {|msg|
 	~circles.circleArray[0..2].do {|ev, circleIndex|
 		ev.noteFunc = { |self, vel, index|
 			var offsetMidinote = [-12, 0, 12][circleIndex];
-			/*var totalTaktDur = self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel;
-			var taktStufe = thisThread.beats
-			.mod(totalTaktDur / 4);
-			var index = ((
-			(taktStufe / (totalTaktDur)) * 4
-			) * 15.999);*/
-			/*if(totalTaktDur < 16){
-			index = index.asInteger
-			}{
-			index = index.round.clip(0,15);
-			};*/
-			// if(~circles.melodieCircle.blockedIndices.includes(index).not){
-			// ~toPhilipp.sendMsg("/melodyIndex", index);
 			{
 				~circles.guiElements.notesHits.add(index);
 				~circles.guiElements.noteHitColor = ev.guiColor.copy.alpha_(0.3);
@@ -129,11 +71,6 @@ OSCdef(\philippMelody, {|msg|
 				chan: ~circles.melodieCircle.instrumentChan,
 				netAddr: ~toBenni
 			).play
-			/*			};
-			~circles.melodieCircle.blockedIndices.add(index);
-			thisThread.clock.sched(self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 16, {
-			~circles.melodieCircle.blockedIndices.remove(index); nil
-			});*/
 		}
 	};
 };
@@ -169,6 +106,12 @@ OSCdef(\philippMelody, {|msg|
 				~circles.melodieCircle.lastNote = nil;
 			};
 			{~circles.guiElements.melodieWindow.visible_(false)}.defer
+		}
+	},
+	linkToRhy1Mute: {|val|
+		// sicherstellen dass unmuted ist wenn link ausgeschaltet wird
+		if(val.asBoolean.not and: {~game1.externalMute}){
+			Pdefn(\rhy1Mute).asStream.next
 		}
 	}
 ));
