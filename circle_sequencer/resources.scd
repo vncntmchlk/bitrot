@@ -9,7 +9,7 @@
 
 ~circles = ();
 
-~circles.circleArray = nil!6;
+~circles.circleArray = nil!7;
 
 ~circles.guiElements ?? {~circles.guiElements = ()};
 ~circles.guiElements.offset = Point( 196, 135 ); //wird auch fuer rechts benutzt...
@@ -28,7 +28,9 @@ OSCdef(\resolution, { |msg|
 	],[1/4],[-4,4]);
 }.value;
 
-~circles.makeAngle = { |radius, circleNum, waitDur, guiColor, circleLegato = (1/8), muteEveryX = 0|
+~circles.makeAngle = { |radius, circleNum, waitDur, guiColor, circleLegato = (1/8), muteEveryX = 0, circleParent|
+	var symCircle = (circleParent ++ "Circle").asSymbol;
+	var symNotesView = (circleParent ++ "NotesView").asSymbol;
 	var ev = (
 		sharedValues: OSCSharedEvent.new(netAddr: ~localHost, prefix: "circ" ++ circleNum),
 		radius: radius,
@@ -38,15 +40,14 @@ OSCdef(\resolution, { |msg|
 		guiHit: 0,
 		guiColor: guiColor,
 		taktIndex: 0,
-		noteArrayLen: 16,
 		arpCounter: 0,
+		taktLen: 16,
 		muteNow: false,
 		muteCount: 0,
 		getIntersections: { |self, angles| self.intersections = angles.select{|ang| ang[1] == self.radius} }
 	);
 	ev.sharedValues.fade = 0;
 	ev.sharedValues.onOff = 0;
-	//ev.sharedValues.quantVal = quantVal;
 	ev.sharedValues.waitDur = waitDur;
 	ev.sharedValues.loopSpeedLevel = 1;
 	ev.sharedValues.circleLegato = circleLegato; // 1/4 ganz, 1/8 halb ..
@@ -81,14 +82,17 @@ OSCdef(\resolution, { |msg|
 	ev.sharedValues.sendAll;
 
 	Tdef(("circ" ++ circleNum).asSymbol, {
-		inf.do {|i|
-			var waitRate = (ev.sharedValues.waitDur / 4 * ev.sharedValues.loopSpeedLevel) / ev.noteArrayLen;
+		loop {
+			var waitRate;
 			var hits = Set.new;
+			var circleSlice;
 			// auch noch ein hits Set fuer melodiecircle usw. ?
-
-			ev.testAngle = ev.taktIndex * 22.5;
 			// 360 / 16
 			if(ev.taktIndex == 0){
+				if(~circles[symCircle].sharedValues.noteArrayLen != ev.taktLen){
+					ev.taktLen = ~circles[symCircle].sharedValues.noteArrayLen.copy;
+					{~circles.guiElements[symNotesView].refresh}.defer
+				};
 				if(ev.sharedValues.muteEveryX > 0){
 					ev.muteNow = (ev.muteCount % ev.sharedValues.muteEveryX) == (ev.sharedValues.muteEveryX - 1);
 					ev.muteCount = ev.muteCount + 1
@@ -96,15 +100,18 @@ OSCdef(\resolution, { |msg|
 					ev.muteNow = false
 				}
 			};
+			waitRate = (ev.sharedValues.waitDur / 4 * ev.sharedValues.loopSpeedLevel) / ev.taktLen;
+			circleSlice = 360 / ev.taktLen;
+			ev.testAngle = ev.taktIndex * circleSlice;
 
 			// intersections in die taktIndices einteilen
 			if(ev.intersections.notNil && ev.muteNow.not){
 				ev.intersections.do {|ang, ix|
 					hits.add(
 						ang[0]
-						.linlin(0,360,0, ev.noteArrayLen - 0.001)
+						.linlin(0,360,0, ev.taktLen - 0.001)
 						.round(1)
-						.clip(0, ev.noteArrayLen - 1)
+						.clip(0, ev.taktLen - 1)
 						.asInteger
 					);
 				};
@@ -115,12 +122,12 @@ OSCdef(\resolution, { |msg|
 					ev.noteFunc(100, ev.taktIndex);
 				};
 				// einer vor taktIndex
-				if(hits.includes((ev.taktIndex + 1) % ev.noteArrayLen)){
-					ev.sendIndexFunc((ev.taktIndex + 1) % ev.noteArrayLen)
+				if(hits.includes((ev.taktIndex + 1) % ev.taktLen)){
+					ev.sendIndexFunc((ev.taktIndex + 1) % ev.taktLen)
 				};
 				//[circleNum, hits, ev.taktIndex].postln;
 			};
-			ev.taktIndex = (ev.taktIndex + 1) % ev.noteArrayLen;
+			ev.taktIndex = (ev.taktIndex + 1) % ev.taktLen;
 			waitRate.wait;
 		}
 	});

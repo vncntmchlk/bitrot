@@ -198,7 +198,7 @@
 				Pseq([false])
 			}
 		}),
-		\pulseSpeed, Pfunc { ev.sharedEv.pulseSpeed.reciprocal },
+		\pulseSpeed, Pfunc { ev.sharedEv.pulseSpeed.reciprocal * (16 / ev.sharedEv.caSize)},
 		\steps, 4,
 		\chan, Pfunc{ ev.evPatChan },
 		\midinote, 36
@@ -208,6 +208,7 @@
 		var stepEv = ev.evPat.next(());
 		var loopPbind;
 		var accumGens = [0];
+		if(ev.gen.myGen.sum == 0){ev.gen.nextGen;};
 		inf.do {
 			var loop, loopGen = false;
 			stepEv.steps.do { |step|

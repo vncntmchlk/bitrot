@@ -31,7 +31,7 @@ thisProcess.openUDPPort(9005); // from philipp
 "../oscMidiEvent.scd".loadRelative;
 "../ca_rhythm/resources.scd".loadRelative;
 "resources_ca_fft.scd".loadRelative;
-"resources_ca_bitflip.scd".loadRelative;
+"resources_ca_bitfl ip.scd".loadRelative;
 "manage_presets.scd".loadRelative;
 ~game1 = ~newCaRhythm.((), prefix: "rhy1");
 ~game2 = ~newCaRhythm.((), prefix: "rhy2");

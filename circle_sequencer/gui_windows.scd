@@ -5,60 +5,50 @@
 ~circles.guiElements.res2 = ~circles.guiElements.resolution * 2;
 
 ["melodie", "bass", "chords"].do { |name|
-	var sym = (name ++ "Window").asSymbol;
+	var symWindow = (name ++ "Window").asSymbol;
 	var symCircle = (name ++ "Circle").asSymbol;
 	var symRefreshPoints = (name ++ "RefreshPoints").asSymbol;
-	~circles.guiElements[sym] = Window(name, Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
-	~circles.guiElements[sym].view.background = Color.black;
-	~circles[symCircle].view = UserView(~circles.guiElements[sym], Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-
+	var symNotesView = (name ++ "NotesView").asSymbol;
+	var symNoteHits = (name ++ "NoteHits").asSymbol;
+	var symNoteHitColor = (name ++ "NoteHitColor").asSymbol;
+	~circles.guiElements[symWindow] = Window(name, Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
+	~circles.guiElements[symWindow].view.background = Color.black;
+	~circles[symCircle].view = UserView(
+		~circles.guiElements[symWindow],
+		Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0)
+	);
 	~circles.guiElements[symRefreshPoints] = SkipJack(
 		updateFunc: {~circles[symCircle].view.refresh},
 		dt: (1 / ~circles.guiElements.fps),
 		autostart: false
 	);
+	~circles.guiElements[symNotesView] = UserView(~circles.guiElements[symWindow],
+		Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100)
+	);
+
+	~circles.guiElements[symNoteHits] = Set.new;
+	~circles.guiElements[symNoteHitColor] = Color.red(0.5,0.2);
+	~circles.guiElements[symNotesView].drawFunc= {
+		~circles[symCircle].sharedValues.noteArrayLen.do {|ix|
+			var rad = (ix * (360 / ~circles[symCircle].sharedValues.noteArrayLen) - 180).degrad;
+			var pt = Polar(280, rad).asPoint.translate(
+				(~circles[symCircle].view.bounds.width/2 + 15)@(~circles[symCircle].view.bounds.height/2 + 25)
+			);
+			~circles.guiElements.noteImgs[~circles[symCircle].noteArray][ix].drawAtPoint(pt);
+			if(~circles.guiElements[symNoteHits].includes(ix)){
+				Pen.color_(~circles.guiElements[symNoteHitColor]);
+				Pen.addRect(Rect(pt.x, pt.y, 75, 35));
+				Pen.fill
+			}
+		};
+		//~circles.guiElements[symNoteHits].clear;
+		// sollte per drawNotesOff geregelt werden
+	};
 };
 
-~circles.guiElements.notesView = UserView(~circles.guiElements.melodieWindow,
-	Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100)
-);
 ~circles.guiElements.noteImgs = (0..127).collect {|nn|
 	Image.open("/home/vincent/Repos/bitrot/bitrot/pngs" +/+ nn ++ ".png")
 };
-~circles.guiElements.notesHits = Set.new;
-~circles.guiElements.noteHitColor = Color.red(0.5,0.2);
-~circles.guiElements.notesView.drawFunc= {
-	16.do {|ix|
-		var rad = (ix * 22.5 - 180).degrad;
-		var pt = Polar(280, rad).asPoint.translate(
-			(~circles.melodieCircle.view.bounds.width/2 + 15)@(~circles.melodieCircle.view.bounds.height/2 + 25)
-		);
-		~circles.guiElements.noteImgs[~circles.melodieCircle.noteArray][ix].drawAtPoint(pt);
-		if(~circles.guiElements.notesHits.includes(ix)){
-			Pen.color_(~circles.guiElements.noteHitColor);
-			Pen.addRect(Rect(pt.x, pt.y, 75, 35));
-			Pen.fill
-		}
-	};
-	~circles.guiElements.notesHits.clear;
-};
-
-/*~circles.guiElements.melodieWindow = Window("melodie", Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
-~circles.guiElements.melodieWindow.view.background = Color.black;
-// ~circles.guiElements.melodieWindow.front;
-
-~circles.guiElements.bassWindow = Window("bass", Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
-~circles.guiElements.bassWindow.view.background = Color.black;
-
-~circles.guiElements.chordsWindow = Window("chords", Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
-~circles.guiElements.chordsWindow.view.background = Color.black;
-
-~circles.melodieCircle.view = UserView(~circles.guiElements.melodieWindow, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-~circles.bassCircle.view = UserView(~circles.guiElements.bassWindow, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));
-~circles.chordsCircle.view = UserView(~circles.guiElements.bassWindow, Rect(50, 50, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0));*/
-
-
-
 
 
 /*~cues = (
