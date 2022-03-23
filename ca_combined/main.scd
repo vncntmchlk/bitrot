@@ -28,19 +28,22 @@ thisProcess.openUDPPort(9005); // from philipp
 ~rpiAddr = NetAddr("10.42.0.208", 9001);
 ~toPhilipp = NetAddr("127.0.0.1", 6666);//NetAddr("192.168.1.102", 9004);
 // ~rpiAddr = NetAddr("169.254.167.159", 9001);
-"../oscMidiEvent.scd".loadRelative;
-"../ca_rhythm/resources.scd".loadRelative;
-"resources_ca_fft.scd".loadRelative;
-"resources_ca_bitfl ip.scd".loadRelative;
 "manage_presets.scd".loadRelative;
+"oscMidiEvent.scd".loadRelative;
+"resources_rhythm.scd".loadRelative;
+"resources_ca_fft.scd".loadRelative;
+"resources_ca_bitflip.scd".loadRelative;
+"resources_clip_launcher.scd".loadRelative;
 ~game1 = ~newCaRhythm.((), prefix: "rhy1");
 ~game2 = ~newCaRhythm.((), prefix: "rhy2");
+~game2.hitColor = \blue;
+~game2.evPatChan = 11;
 ~gameFFT = ~caFFT.(16, 6);
 ~gameBitFlip = ~caBitFlip.(16, 6);
 // circle sequencer
-"../circle_sequencer/resources.scd".loadRelative;
-"../circle_sequencer/gui_windows.scd".loadRelative;
-~presetManager.sendPresetsToOSC;
+"resources_circle.scd".loadRelative;
+"gui_windows_circle.scd".loadRelative;
+
 // ~rpiAddr.sendMsg("/circles", 1);
 )
 
@@ -49,40 +52,25 @@ thisProcess.openUDPPort(9005); // from philipp
 ~circles.guiElements.bassWindow.bounds.origin;
 ~circles.guiElements.chordsWindow.bounds.origin;
 // USW
-
+Tdef(("circ0").asSymbol).quant
 ~rpiAddr.sendMsg("/circles", 0);
 ~rpiAddr.sendMsg("/circles", 1);
 
 ~toBenni.sendMsg("/clips", 0)
-~toBenni.sendMsg("/bitrotData", "fftBinsGain", *(0!6)) // -70 - 70 gain fuer jeweiliges Band
+~toBenni.sendMsg("/clips", 1)
+~toBenni.sendMsg("/clips", 2)
 
-~game2.evPatChan = 11
 TempoClock.default.tempo = 1;
 
-~game2Player = ~game2.spawner.play(quant: 2);
-~game2Player.stop
-~game2.evPat = Pbind(
-	\pulseSpeed, Pseq([1/8],inf),
-	\steps, 4,
-	\chan, 11,
-	\midinote, 36
-).asStream;
-~game2.hitColor = \blue;
-~game2.evPatChan = 11;
 // wie kann man hier chan sinnvoll reinbringen?
 // waere auch gut wenn es zb Pseq([11, 12],inf) moeglich waere
 
+~circles.melodieCircle.presetManager[\savePreset].("suesseMelodie3")
+~circles.melodieCircle.presetManager[\showPresetDifference].("suesseMelodie2")
+~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
+~circles.bassCircle.presetManager[\savePreset].("basicOFF")
+~gameFFT.presetManager[\savePreset].("soft_high")
+~gameBitFlip.presetManager[\savePreset].("basicOFF")
+~rhythmPM[\savePreset].("10th")
 
-// am nicesten waere pro ding (melodie, rhy usw) separate presets zu haben und dann noch globale die die separaten verknuepfen koennen
-~presetManager[\savePreset].([\rhy, \melodie], "aaa")
-~presetManager[\loadPreset].("suesseMelodie")
-~presetManager[\showPresetDifference].("aaa")
-~presetManager[\loadPreset].("aaa")
-
-[\rhy, \bitflip].collect {|sym| ~presetManager.globalEvNames[sym]}.flat.postcs;
-
-~presetManager[\showPresetDifference].("suesseMelodie2")
-
-
-~presetManager[\savePreset].([\melodie], "suesseMelodie2")
-
+~circles.melodieCircle.presetManager[\savePreset].("simpleMath")

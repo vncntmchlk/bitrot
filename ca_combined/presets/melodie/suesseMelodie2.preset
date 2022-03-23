@@ -18,11 +18,11 @@ p = [
 	2, [ array: o[3],  size: 6 ],  
 	// Array
 	3, [ nil,  nil,  nil,  nil,  
-		'waitDur',  8.0,  'fade',  0,  
+		'waitDur',  8,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
-		'muteEveryX',  0.0,  'onOff',  1,  
-		'circleLegato',  0.10000000149012,  nil,  nil,  
-		'loopSpeedLevel',  2.0,  nil,  nil ],  
+		'muteEveryX',  0,  'onOff',  1,  
+		'circleLegato',  0.090000003576279,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ],  
 	// Dictionary
 	4, [ array: o[5],  size: 6 ],  
 	// Array
@@ -30,24 +30,24 @@ p = [
 		'waitDur',  4.0,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
 		'muteEveryX',  0,  'onOff',  0,  
-		'circleLegato',  0.25,  nil,  nil,  
-		'loopSpeedLevel',  2.0,  nil,  nil ],  
+		'circleLegato',  0.125,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ],  
 	// Dictionary
 	6, [ array: o[7],  size: 5 ],  
 	// Array
 	7, [ nil,  nil,  'onOff',  1,  
 		nil,  nil,  'freezeMe',  0,  
-		'noteArrayLen',  6,  'linkToRhy1Mute',  0,  
+		'noteArrayLen',  12,  'linkToRhy1Mute',  0,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  'monoMode',  0 ],  
 	// Dictionary
 	8, [ array: o[9],  size: 6 ],  
 	// Array
 	9, [ nil,  nil,  nil,  nil,  
-		'waitDur',  6.0,  'fade',  0,  
+		'waitDur',  2.0,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
-		'muteEveryX',  0.0,  'onOff',  1,  
-		'circleLegato',  0.10999999940395,  nil,  nil,  
+		'muteEveryX',  0,  'onOff',  1,  
+		'circleLegato',  0.5,  nil,  nil,  
 		'loopSpeedLevel',  2.0,  nil,  nil ]
 ];
 prUnarchive(o,p);

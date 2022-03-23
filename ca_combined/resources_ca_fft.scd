@@ -12,7 +12,7 @@
 	sharedEvFFT.caRange = [0, 5];
 	sharedEvFFT.tdefOnOff = 0;
 
-	win = Window.new(bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
+	win = Window.new("fft", bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
 	if(frontWindow){
 		win.front
 	};
@@ -175,6 +175,8 @@
 	OSCdef((prefix ++ 'set_0_dB').asSymbol, { |msg|
 		~toBenni.sendMsg("/bitrotData", "fftBinsGain", *[0, 0, 0, 0, 0, 0]);
 	},"/" +/+ prefix +/+ "set_0_dB").fix;
+
+	game.presetManager = ~makePresetManager.(prefix,["~gameFFT.sharedEv"]);
 
 	game
 };

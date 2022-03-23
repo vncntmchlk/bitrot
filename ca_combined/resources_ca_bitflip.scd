@@ -12,7 +12,7 @@
 	sharedEv.caRange = [0, 9];
 	sharedEv.tdefOnOff = 0;
 
-	win = Window.new(bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
+	win = Window.new("bitflip", bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
 	if(frontWindow){
 		win.front
 	};
@@ -169,6 +169,13 @@
 	OSCdef((prefix ++ 'killSwitch').asSymbol, { |msg|
 		if(msg[1].asBoolean){game.killSwitch}
 	},"/" +/+ prefix +/+ "killSwitch").fix;
+
+	// send 0 for all bits
+	OSCdef((prefix ++ 'set_0').asSymbol, { |msg|
+		~toBenni.sendMsg("/bitrotData", *(["xorBits"] ++ (0!10)));
+	},"/" +/+ prefix +/+ "set_0").fix;
+
+	game.presetManager = ~makePresetManager.(prefix, ["~gameBitFlip.sharedEv"]);
 
 	game
 };
