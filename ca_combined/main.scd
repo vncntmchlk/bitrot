@@ -40,6 +40,7 @@ thisProcess.openUDPPort(9005); // from philipp
 // circle sequencer
 "../circle_sequencer/resources.scd".loadRelative;
 "../circle_sequencer/gui_windows.scd".loadRelative;
+~presetManager.sendPresetsToOSC;
 // ~rpiAddr.sendMsg("/circles", 1);
 )
 
@@ -67,16 +68,21 @@ TempoClock.default.tempo = 1;
 	\midinote, 36
 ).asStream;
 ~game2.hitColor = \blue;
+~game2.evPatChan = 11;
 // wie kann man hier chan sinnvoll reinbringen?
 // waere auch gut wenn es zb Pseq([11, 12],inf) moeglich waere
 
-~presetManager[\savePreset].([
-	"~game1.sharedEv",
-	"~game2.sharedEv",
-	"~gameFFT.sharedEv",
-	"~gameBitFlip.sharedEv"
-], "aaa")
+
+// am nicesten waere pro ding (melodie, rhy usw) separate presets zu haben und dann noch globale die die separaten verknuepfen koennen
+~presetManager[\savePreset].([\rhy, \melodie], "aaa")
+~presetManager[\loadPreset].("suesseMelodie")
+~presetManager[\showPresetDifference].("aaa")
 ~presetManager[\loadPreset].("aaa")
 
-~presetManager[\showPresetDifference].("aaa")
+[\rhy, \bitflip].collect {|sym| ~presetManager.globalEvNames[sym]}.flat.postcs;
+
+~presetManager[\showPresetDifference].("suesseMelodie2")
+
+
+~presetManager[\savePreset].([\melodie], "suesseMelodie2")
 

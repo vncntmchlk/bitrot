@@ -39,9 +39,9 @@ OSCdef(\resolution, { |msg|
 		testAngle: 0,
 		guiHit: 0,
 		guiColor: guiColor,
+		taktLen: 16,
 		taktIndex: 0,
 		arpCounter: 0,
-		taktLen: 16,
 		muteNow: false,
 		muteCount: 0,
 		getIntersections: { |self, angles| self.intersections = angles.select{|ang| ang[1] == self.radius} }
@@ -89,9 +89,12 @@ OSCdef(\resolution, { |msg|
 			// auch noch ein hits Set fuer melodiecircle usw. ?
 			// 360 / 16
 			if(ev.taktIndex == 0){
-				if(~circles[symCircle].sharedValues.noteArrayLen != ev.taktLen){
-					ev.taktLen = ~circles[symCircle].sharedValues.noteArrayLen.copy;
+				if(~circles[symCircle].sharedValues.noteArrayLen != ~circles[symCircle].taktLen){
+					~circles[symCircle].taktLen = ~circles[symCircle].sharedValues.noteArrayLen.copy;
 					{~circles.guiElements[symNotesView].refresh}.defer
+				};
+				if(ev.taktLen != ~circles[symCircle].taktLen){
+					ev.taktLen = ~circles[symCircle].taktLen.copy;
 				};
 				if(ev.sharedValues.muteEveryX > 0){
 					ev.muteNow = (ev.muteCount % ev.sharedValues.muteEveryX) == (ev.sharedValues.muteEveryX - 1);

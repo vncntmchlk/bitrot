@@ -8,6 +8,7 @@
 	points: [],
 	instrumentName: "notes0",
 	instrumentChan: 0,
+	taktLen: 16,
 	guiText: "MELODIE"
 );
 
@@ -31,7 +32,7 @@ OSCdef(\philippMelody, {|msg|
 ~circles.melodieCircle.drawNoteOn = { |index, color|
 	{
 		~circles.guiElements.melodieNoteHits.add(index);
-		~circles.guiElements.melodieNoteHitColor = color;
+		~circles.guiElements.melodieNoteHitColor[index] = color;
 		~circles.guiElements.melodieNotesView.refresh
 	}.fork(AppClock);
 };
@@ -47,41 +48,45 @@ OSCdef(\philippMelody, {|msg|
 ~circles.melodieCircle.monoNoteFunc = {
 	~circles.circleArray[0..2].do {|ev|
 		ev.noteFunc = { |self, vel, index|
-			if(~circles.melodieCircle.lastNote != ~circles.melodieCircle.noteArray[index]){
-				if(~circles.melodieCircle.lastNote.notNil){
-					//~mOut.noteOff(0, ~circles.melodieCircle.lastNote);
-					~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.lastNote, 0);
-					~circles.melodieCircle[\drawNoteOff].(~circles.melodieCircle.lastIndex);
-				};
-				~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
-				//~mOut.noteOn(0, ~melodie[index], 70);
-				~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.noteArray[index], vel);
-				~circles.melodieCircle.lastNote = ~circles.melodieCircle.noteArray[index];
-				~circles.melodieCircle.lastIndex = index;
-				if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
-					Pdefn(\rhy1Mute).asStream.next
-				};
-			};
+			if(~circles.melodieCircle.sharedValues.onOff.asBoolean){
+				if(~circles.melodieCircle.lastNote != ~circles.melodieCircle.noteArray[index]){
+					if(~circles.melodieCircle.lastNote.notNil){
+						//~mOut.noteOff(0, ~circles.melodieCircle.lastNote);
+						~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.lastNote, 0);
+						~circles.melodieCircle[\drawNoteOff].(~circles.melodieCircle.lastIndex);
+					};
+					~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+					//~mOut.noteOn(0, ~melodie[index], 70);
+					~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.noteArray[index], vel);
+					~circles.melodieCircle.lastNote = ~circles.melodieCircle.noteArray[index];
+					~circles.melodieCircle.lastIndex = index;
+					if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
+						Pdefn(\rhy1Mute).asStream.next
+					}
+				}
+			}
 		}
 	};
 };
 ~circles.melodieCircle.noteFunc = {
 	~circles.circleArray[0..2].do {|ev, circleIndex|
 		ev.noteFunc = { |self, vel, index|
-			var offsetMidinote = [-12, 0, 12][circleIndex];
-			~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
-			if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
-				Pdefn(\rhy1Mute).asStream.next
-			};
-			(
-				midinote: ~circles.melodieCircle.noteArray[index] + offsetMidinote,
-				dur: self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 4,
-				legato: self.sharedValues.circleLegato,
-				type: \oscMidi,
-				chan: ~circles.melodieCircle.instrumentChan,
-				netAddr: ~toBenni,
-				drawOff: Pfunc {|ev| {~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3))}.defer(ev.delta);0}
-			).play
+			if(~circles.melodieCircle.sharedValues.onOff.asBoolean){
+				var offsetMidinote = [-12, 0, 12][circleIndex];
+				~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+				if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
+					Pdefn(\rhy1Mute).asStream.next
+				};
+				(
+					midinote: ~circles.melodieCircle.noteArray[index] + offsetMidinote,
+					dur: self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 4,
+					legato: self.sharedValues.circleLegato,
+					type: \oscMidiNoteOffFunc,
+					chan: ~circles.melodieCircle.instrumentChan,
+					netAddr: ~toBenni,
+					noteOffFunc: {~circles.melodieCircle[\drawNoteOff].(index)}
+				).play
+			}
 		}
 	};
 };
@@ -128,7 +133,7 @@ OSCdef(\philippMelody, {|msg|
 		}
 	}
 	/*noteArrayLen: {|newLen|
-		{~circles.guiElements.melodieNotesView.refresh}.defer
+	{~circles.guiElements.melodieNotesView.refresh}.defer
 	}*/
 ));
 ~circles.melodieCircle.sharedValues.sendAll;

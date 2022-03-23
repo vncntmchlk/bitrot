@@ -15,6 +15,7 @@
 	points: [],
 	instrumentName: "notes1",
 	instrumentChan: 1,
+	taktLen: 16,
 	guiText: "CHORDS"
 );
 
@@ -36,7 +37,7 @@ OSCdef(\philippChords, {|msg|
 ~circles.chordsCircle.drawNoteOn = { |index, color|
 	{
 		~circles.guiElements.chordsNoteHits.add(index);
-		~circles.guiElements.chordsNoteHitColor = color;
+		~circles.guiElements.chordsNoteHitColor[index] = color;
 		~circles.guiElements.chordsNotesView.refresh
 	}.fork(AppClock);
 };
@@ -51,40 +52,49 @@ OSCdef(\philippChords, {|msg|
 ~circles.chordsCircle.monoNoteFunc = {
 	~circles.circleArray[5..6].do {|ev|
 		ev.noteFunc = { |self, vel, index|
-			if(~circles.chordsCircle.lastNote != ~circles.chordsCircle.noteArray[index]){
-				if(~circles.chordsCircle.lastNote.notNil){
-					//~mOut.noteOff(0, ~circles.chordsCircle.lastNote);
-					~toBenni.sendMsg(~circles.chordsCircle.instrumentName, ~circles.chordsCircle.lastNote, 0);
-					~circles.chordsCircle[\drawNoteOff].(~circles.chordsCircle.lastIndex);
-				};
-				~circles.chordsCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
-				//~mOut.noteOn(0, ~melodie[index], 70);
-				~toBenni.sendMsg(~circles.chordsCircle.instrumentName, ~circles.chordsCircle.noteArray[index], vel);
-				~circles.chordsCircle.lastNote = ~circles.chordsCircle.noteArray[index];
-				~circles.chordsCircle.lastIndex = index;
-				if(~circles.chordsCircle.sharedValues.linkToRhy1Mute.asBoolean){
-					Pdefn(\rhy1Mute).asStream.next
-				};
-			};
+			if(~circles.chordsCircle.sharedValues.onOff.asBoolean){
+				if(~circles.chordsCircle.lastNote != ~circles.chordsCircle.noteArray[index]){
+					if(~circles.chordsCircle.lastNote.notNil){
+						//~mOut.noteOff(0, ~circles.chordsCircle.lastNote);
+						~toBenni.sendMsg(~circles.chordsCircle.instrumentName, ~circles.chordsCircle.lastNote, 0);
+						~circles.chordsCircle[\drawNoteOff].(~circles.chordsCircle.lastIndex);
+					};
+					~circles.chordsCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+					//~mOut.noteOn(0, ~melodie[index], 70);
+					~toBenni.sendMsg(~circles.chordsCircle.instrumentName, ~circles.chordsCircle.noteArray[index], vel);
+					~circles.chordsCircle.lastNote = ~circles.chordsCircle.noteArray[index];
+					~circles.chordsCircle.lastIndex = index;
+					if(~circles.chordsCircle.sharedValues.linkToRhy1Mute.asBoolean){
+						Pdefn(\rhy1Mute).asStream.next
+					}
+				}
+			}
 		}
 	};
 };
 ~circles.chordsCircle.noteFunc = {
 	~circles.circleArray[5..6].do {|ev|
 		ev.noteFunc = { |self, vel, index|
-			~circles.chordsCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
-			if(~circles.chordsCircle.sharedValues.linkToRhy1Mute.asBoolean){
-				Pdefn(\rhy1Mute).asStream.next
-			};
-			(
-				midinote: ~circles.chordsCircle.noteArray[index],
-				dur: self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 4,
-				legato: self.sharedValues.circleLegato,
-				type: \oscMidi,
-				chan: ~circles.chordsCircle.instrumentChan,
-				netAddr: ~toBenni,
-				drawOff: Pfunc {|ev| {~circles.chordsCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3))}.defer(ev.delta);0}
-			).play
+			if(~circles.chordsCircle.sharedValues.onOff.asBoolean){
+				~circles.chordsCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+				if(~circles.chordsCircle.sharedValues.linkToRhy1Mute.asBoolean){
+					Pdefn(\rhy1Mute).asStream.next
+				};
+				(
+					midinote: ~circles.chordsCircle.noteArray[index],
+					dur: self.sharedValues.waitDur * self.sharedValues.loopSpeedLevel / 4,
+					legato: self.sharedValues.circleLegato,
+					type: \oscMidiNoteOffFunc,
+					chan: ~circles.chordsCircle.instrumentChan,
+					netAddr: ~toBenni,
+					drawOff: Pfunc {|ev|
+						{
+							~circles.chordsCircle[\drawNoteOff].(index)
+						}.defer(ev.delta);
+						0
+					}
+				).play
+			}
 		}
 	};
 };
@@ -123,7 +133,7 @@ OSCdef(\philippChords, {|msg|
 		}
 	}
 	/*noteArrayLen: {|newLen|
-		{~circles.guiElements.chordsNotesView.refresh}.defer
+	{~circles.guiElements.chordsNotesView.refresh}.defer
 	}*/
 ));
 ~circles.chordsCircle.sharedValues.sendAll;

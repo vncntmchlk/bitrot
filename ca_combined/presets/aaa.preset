@@ -1,35 +1,45 @@
 var o, p;
 o = [
-	Event.prNew,  Array.prNew(16),  Dictionary.prNew,  Array.prNew(28),  
-	Array.prNew(2),  Dictionary.prNew,  Array.prNew(96),  Dictionary.prNew,  
-	Array.prNew(28),  Array.prNew(2),  Dictionary.prNew,  Array.prNew(96)
+	Event.prNew,  Array.prNew(32),  Dictionary.prNew,  Array.prNew(20),  
+	Dictionary.prNew,  Array.prNew(24),  Dictionary.prNew,  Array.prNew(96),  
+	Dictionary.prNew,  Array.prNew(24),  Dictionary.prNew,  Array.prNew(96),  
+	Dictionary.prNew,  Array.prNew(24)
 ];
 p = [
 	// Event
-	0, [ array: o[1],  size: 4,  
+	0, [ array: o[1],  size: 6,  
 		proto: nil,  parent: nil,  
 		know: true ],  
 	// Array
-	1, [ nil,  nil,  '~gameBitFlip.sharedEv',  o[2],  
-		'~game2.sharedEv',  o[5],  '~gameFFT.sharedEv',  o[7],  
+	1, [ nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		'~game1.sharedEv',  o[10],  nil,  nil ],  
-	// Dictionary
-	2, [ array: o[3],  size: 7 ],  
-	// Array
-	3, [ 'tdefOnOff',  0,  nil,  nil,  
-		nil,  nil,  'sendRate',  2,  
-		'blendSteps',  10,  nil,  nil,  
-		nil,  nil,  'caSize',  16,  
+		nil,  nil,  '~circles.melodieCircle.sharedValues',  o[2],  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'currentRule',  30,  
-		'lastValuesSize',  6,  'caRange',  o[4] ],  
-	// Array
-	4, [ 0,  9 ],  
+		nil,  nil,  '~circles.circleArray[0].sharedValues',  o[4],  
+		'~game2.sharedEv',  o[6],  '~circles.circleArray[2].sharedValues',  o[8],  
+		nil,  nil,  nil,  nil,  
+		'~game1.sharedEv',  o[10],  '~circles.circleArray[1].sharedValues',  o[12] ],  
 	// Dictionary
-	5, [ array: o[6],  size: 24 ],  
+	2, [ array: o[3],  size: 5 ],  
 	// Array
-	6, [ 'buttons/13',  0,  'buttons/0',  0,  
+	3, [ nil,  nil,  'onOff',  0,  
+		nil,  nil,  'freezeMe',  true,  
+		'noteArrayLen',  16,  'linkToRhy1Mute',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'monoMode',  1 ],  
+	// Dictionary
+	4, [ array: o[5],  size: 6 ],  
+	// Array
+	5, [ nil,  nil,  nil,  nil,  
+		'waitDur',  8,  'fade',  0,  
+		nil,  nil,  nil,  nil,  
+		'muteEveryX',  0,  'onOff',  0,  
+		'circleLegato',  0.125,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ],  
+	// Dictionary
+	6, [ array: o[7],  size: 24 ],  
+	// Array
+	7, [ 'buttons/13',  0,  'buttons/0',  0,  
 		'caSize',  16,  'buttons/15',  0,  
 		nil,  nil,  'buttons/5',  0,  
 		nil,  nil,  'currentRule',  86,  
@@ -54,30 +64,27 @@ p = [
 		'buttons/7',  0,  nil,  nil,  
 		nil,  nil,  'linkFFTCa',  0 ],  
 	// Dictionary
-	7, [ array: o[8],  size: 7 ],  
+	8, [ array: o[9],  size: 6 ],  
 	// Array
-	8, [ 'tdefOnOff',  0.0,  nil,  nil,  
-		nil,  nil,  'sendRate',  8.0,  
-		'blendSteps',  1,  nil,  nil,  
-		nil,  nil,  'caSize',  16,  
+	9, [ nil,  nil,  nil,  nil,  
+		'waitDur',  8,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'currentRule',  30,  
-		'lastValuesSize',  1,  'caRange',  o[9] ],  
-	// Array
-	9, [ 0,  1 ],  
+		'muteEveryX',  0,  'onOff',  0,  
+		'circleLegato',  0.125,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ],  
 	// Dictionary
 	10, [ array: o[11],  size: 24 ],  
 	// Array
 	11, [ 'buttons/13',  0,  'buttons/0',  0,  
-		'caSize',  8,  'buttons/15',  0,  
-		nil,  nil,  'buttons/5',  1.0,  
+		'caSize',  16,  'buttons/15',  0,  
+		nil,  nil,  'buttons/5',  0,  
 		nil,  nil,  'currentRule',  86,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		'buttons/4',  0,  'buttons/6',  0,  
-		'pulseSpeed',  8,  'buttons/3',  1.0,  
-		nil,  nil,  'onOff',  1.0,  
+		'pulseSpeed',  8,  'buttons/3',  0,  
+		nil,  nil,  'onOff',  0,  
 		nil,  nil,  'buttons/11',  0,  
 		nil,  nil,  'buttons/9',  0,  
 		'buttons/2',  0,  'buttons/8',  0,  
@@ -91,6 +98,15 @@ p = [
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		'buttons/7',  0,  nil,  nil,  
-		nil,  nil,  'linkFFTCa',  1 ]
+		nil,  nil,  'linkFFTCa',  0 ],  
+	// Dictionary
+	12, [ array: o[13],  size: 6 ],  
+	// Array
+	13, [ nil,  nil,  nil,  nil,  
+		'waitDur',  8,  'fade',  0,  
+		nil,  nil,  nil,  nil,  
+		'muteEveryX',  0,  'onOff',  0,  
+		'circleLegato',  0.125,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ]
 ];
 prUnarchive(o,p);

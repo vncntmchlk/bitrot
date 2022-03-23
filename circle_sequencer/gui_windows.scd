@@ -27,16 +27,16 @@
 	);
 
 	~circles.guiElements[symNoteHits] = Set.new;
-	~circles.guiElements[symNoteHitColor] = Color.red(0.5,0.2);
+	~circles.guiElements[symNoteHitColor] = Color.red(0.5,0.2) ! 16;
 	~circles.guiElements[symNotesView].drawFunc= {
-		~circles[symCircle].sharedValues.noteArrayLen.do {|ix|
-			var rad = (ix * (360 / ~circles[symCircle].sharedValues.noteArrayLen) - 180).degrad;
+		~circles[symCircle].taktLen.do {|ix|
+			var rad = (ix * (360 / ~circles[symCircle].taktLen) - 180).degrad;
 			var pt = Polar(280, rad).asPoint.translate(
 				(~circles[symCircle].view.bounds.width/2 + 15)@(~circles[symCircle].view.bounds.height/2 + 25)
 			);
 			~circles.guiElements.noteImgs[~circles[symCircle].noteArray][ix].drawAtPoint(pt);
 			if(~circles.guiElements[symNoteHits].includes(ix)){
-				Pen.color_(~circles.guiElements[symNoteHitColor]);
+				Pen.color_(~circles.guiElements[symNoteHitColor][ix]);
 				Pen.addRect(Rect(pt.x, pt.y, 75, 35));
 				Pen.fill
 			}
