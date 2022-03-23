@@ -46,9 +46,12 @@
 	};
 };
 
-~circles.guiElements.noteImgs = (0..127).collect {|nn|
-	Image.open("/home/vincent/Repos/bitrot/bitrot/pngs" +/+ nn ++ ".png")
-};
+{
+	var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "pngs";
+	~circles.guiElements.noteImgs = (0..127).collect {|nn|
+		Image.open(imgPath +/+ nn ++ ".png")
+	};
+}.value;
 
 
 /*~cues = (
