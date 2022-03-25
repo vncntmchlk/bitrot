@@ -18,15 +18,25 @@
 // es wird jetzt nur durch dur und speedfaktor bestimmt (8, 1, fuer sechzehntel quantisierung)
 
 
+// roter buzzer fuer random massaker (von anfang das ding)
+// noch ein kreis fuer zweite melodie
+// und noch einer fuer sample sequencer (dann brauchst du auch nicht den link, theoretisch, aber egal trotzdem drin lassen weil es einfacher ist?)
+
+//gaba preset: 10th und accelerando zu tempo clock 2.5, schnelle melodie kommt spaeter dazu
+
+// sample loop sequencer
+// pro loop geht der fft ca einen weiter (lastvals 0 usw.)
+
+
 (
 thisProcess.openUDPPort(9010); // from open stage control
 thisProcess.openUDPPort(9000); // from rpi
 thisProcess.openUDPPort(9005); // from philipp
-~toBenni = NetAddr("169.254.85.142", 7401);
-// ~toBenni = NetAddr("192.168.1.100", 7401);
+// ~toBenni = NetAddr("169.254.85.142", 7401);
+~toBenni = NetAddr("192.168.1.101", 7401);
 ~localHost = NetAddr("127.0.0.1", 9001); // to open stage control
 ~rpiAddr = NetAddr("10.42.0.208", 9001);
-~toPhilipp = NetAddr("127.0.0.1", 6666);//NetAddr("192.168.1.102", 9004);
+~toPhilipp = NetAddr("192.168.1.102", 9004);//NetAddr("192.168.1.102", 9004);
 // ~rpiAddr = NetAddr("169.254.167.159", 9001);
 "manage_presets.scd".loadRelative;
 "oscMidiEvent.scd".loadRelative;
@@ -58,19 +68,67 @@ Tdef(("circ0").asSymbol).quant
 
 ~toBenni.sendMsg("/clips", 0)
 ~toBenni.sendMsg("/clips", 1)
-~toBenni.sendMsg("/clips", 2)
+~toBenni.sendMsg("/clips", 3)
+~toBenni.sendMsg("/cue", 3)
 
-TempoClock.default.tempo = 1;
+TempoClock.default.tempo = 2.5;
 
 // wie kann man hier chan sinnvoll reinbringen?
 // waere auch gut wenn es zb Pseq([11, 12],inf) moeglich waere
 
-~circles.melodieCircle.presetManager[\savePreset].("suesseMelodie3")
+~circles.melodieCircle.presetManager[\savePreset].("gabaFull")
 ~circles.melodieCircle.presetManager[\showPresetDifference].("suesseMelodie2")
 ~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
-~circles.bassCircle.presetManager[\savePreset].("basicOFF")
+~circles.bassCircle.presetManager[\savePreset].("bassEntwicklung")
 ~gameFFT.presetManager[\savePreset].("soft_high")
 ~gameBitFlip.presetManager[\savePreset].("basicOFF")
 ~rhythmPM[\savePreset].("10th")
 
 ~circles.melodieCircle.presetManager[\savePreset].("simpleMath")
+
+
+
+
+Tdef(\sampleLooper, {
+	loop {
+		~toBenni.sendMsg("/clips", 7);
+		4.wait;
+		Pdefn(\caFFTNext).asStream.next;
+	}
+}).play
+
+~gameFFT.seedMe;
+{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
+
+
+Tdef(\sampleLooper, {
+	loop {
+		~toBenni.sendMsg("/clips", 7);
+		2.wait;
+		Pdefn(\caFFTNext).asStream.next;
+	}
+})
+Tdef(\sampleLooper).stop
+Tdef(\sampleLooper, {
+	loop {
+		~toBenni.sendMsg("/clips", 7);
+		1.wait;
+		Pdefn(\caFFTNext).asStream.next;
+	}
+})
+
+Tdef(\sampleLooper, {
+	loop {
+		~toBenni.sendMsg("/clips", 7);
+		0.25.wait;
+		Pdefn(\caFFTNext).asStream.next;
+	}
+})
+
+Tdef(\sampleLooper, {
+	loop {
+		~toBenni.sendMsg("/clips", 7);
+		8.wait;
+		// Pdefn(\caFFTNext).asStream.next;
+	}
+}).play

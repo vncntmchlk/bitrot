@@ -9,7 +9,14 @@ a = FoscStaff(FoscLeafMaker().(#[60], [1]));
 m = FoscTimeSignature(#[3,8], hide: true);
 a[0].attach(m);
 a.show;
-
+s
+a = FoscStaff();
+a.add(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+m = override(a);
+// m.score.barline.visible = false
+m.timesignature.visible = false
+a.format;
+a.show;
 
 ~circles.guiElements.notesView.refresh
 ~melodie = ~melodie.scramble

@@ -14,12 +14,20 @@
 		"~circles.bassCircle.sharedValues",
 		"~circles.circleArray[3].sharedValues",
 		"~circles.circleArray[4].sharedValues"
-	])
+	]),
+	lastTime: SystemClock.seconds
 );
 
-~circles.bassCircle[3..4].do {|ev|
+~circles.circleArray[3..4].do {|ev|
+	var minTimeInBetween = 0.05; // 20 hz
 	ev.sendIndexFunc = { |self, index|
-		~toPhilipp.sendMsg("/bassIndex", index);
+		if(~circles.bassCircle.sharedValues.onOff.asBoolean){
+			var now = SystemClock.seconds;
+			if((now - ~circles.bassCircle.lastTime) > minTimeInBetween){
+				~toPhilipp.sendMsg("/bassIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+				~circles.bassCircle.lastTime = now
+			}
+		}
 	}
 };
 

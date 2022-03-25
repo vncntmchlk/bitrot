@@ -15,7 +15,8 @@
 		"~circles.circleArray[0].sharedValues",
 		"~circles.circleArray[1].sharedValues",
 		"~circles.circleArray[2].sharedValues"
-	])
+	]),
+	lastTime: SystemClock.seconds
 );
 
 ~circles.melodieCircle.noteArray = (60..75).scramble;
@@ -27,8 +28,15 @@ OSCdef(\philippMelody, {|msg|
 }, "/melodyList").fix;
 
 ~circles.circleArray[0..2].do {|ev|
+	var minTimeInBetween = 0.05; // 20 hz
 	ev.sendIndexFunc = { |self, index|
-		~toPhilipp.sendMsg("/melodyIndex", index);
+		if(~circles.melodieCircle.sharedValues.onOff.asBoolean){
+			var now = SystemClock.seconds;
+			if((now - ~circles.melodieCircle.lastTime) > minTimeInBetween){
+				~toPhilipp.sendMsg("/melodyIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+				~circles.melodieCircle.lastTime = now
+			}
+		}
 	}
 };
 

@@ -11,6 +11,7 @@
 	sharedEvFFT.blendSteps = 10;
 	sharedEvFFT.caRange = [0, 5];
 	sharedEvFFT.tdefOnOff = 0;
+	sharedEvFFT.blockOrPass = 0;
 
 	win = Window.new("fft", bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
 	if(frontWindow){
@@ -185,18 +186,27 @@ Tdef(\fftBinsGainSmooth, {
 	var lastColSums = 0 ! ~gameFFT.sharedEv.caSize;
 	var nextColSums;
 	var sendDb;
-	var sendDbDummy = -60!6;
+	var sendDbDummyAllOn = 0!6;//-60!6;
+	var sendDbDummyAllOff = -60!6;
 	var dbArr = [
-		[-15, 1],
-		[-9, 1],
-		[-21, 1],
-		[-27, 1],
-		[-36, 1],
-		[-9, 1]
+		[-70, 1],
+		[-70, 1],
+		[-70, 1],
+		[-70, 1],
+		[-70, 1],
+		[-70, 1]
 	];
-	var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
+	/*	var dbArr = [
+	[-25, 1],
+	[-9, 1],
+	[-21, 1],
+	[-27, 1],
+	[-36, 1],
+	[-9, 1]
+	];*/
+	var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[3, -3]);
 	var calcDbArray = {
-		var res = sendDbDummy.copy;
+		var res = if(~gameFFT.sharedEv.blockOrPass.asBoolean){sendDbDummyAllOn.copy}{sendDbDummyAllOff.copy};
 		~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].do {|v, ix|
 			res[ix + ~gameFFT.delayedCaRange[0]] = emphasizeMidSection[v].linlin(0, 1, *dbArr[ix])
 		};

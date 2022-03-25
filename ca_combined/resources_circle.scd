@@ -44,6 +44,7 @@ OSCdef(\resolution, { |msg|
 		arpCounter: 0,
 		muteNow: false,
 		muteCount: 0,
+		waitRateNow: 0.1,
 		getIntersections: { |self, angles| self.intersections = angles.select{|ang| ang[1] == self.radius} }
 	);
 	ev.sharedValues.fade = 0;
@@ -111,6 +112,7 @@ OSCdef(\resolution, { |msg|
 				}
 			};
 			waitRate = (copyWaitDur / 4 * copyLoopSpeedLevel) / ev.taktLen;
+			ev.waitRateNow = waitRate;
 			circleSlice = 360 / ev.taktLen;
 			ev.testAngle = ev.taktIndex * circleSlice;
 
