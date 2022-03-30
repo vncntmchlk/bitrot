@@ -13,10 +13,6 @@
 
 // drums mit delay und grains, tempo geht auch sehr schnell
 
-// kreissequenzer:
-// quant bzw quantVal wird verabschiedet.
-// es wird jetzt nur durch dur und speedfaktor bestimmt (8, 1, fuer sechzehntel quantisierung)
-
 
 // roter buzzer fuer random massaker (von anfang das ding)
 // noch ein kreis fuer zweite melodie

@@ -11,6 +11,11 @@
 	var symNotesView = (name ++ "NotesView").asSymbol;
 	var symNoteHits = (name ++ "NoteHits").asSymbol;
 	var symNoteHitColor = (name ++ "NoteHitColor").asSymbol;
+	var symNoteImages = (
+		\melodie: \noteImgsGClef,
+		\chords: \noteImgsGClef,
+		\bass: \noteImgsFClef
+	)[name.asSymbol];
 	~circles.guiElements[symWindow] = Window(name, Rect(0, 0, ~circles.guiElements.res2[1] + 100,~circles.guiElements.res2[0] + 100));
 	~circles.guiElements[symWindow].view.background = Color.black;
 	~circles[symCircle].view = UserView(
@@ -34,10 +39,10 @@
 			var pt = Polar(280, rad).asPoint.translate(
 				(~circles[symCircle].view.bounds.width/2 + 15)@(~circles[symCircle].view.bounds.height/2 + 25)
 			);
-			~circles.guiElements.noteImgs[~circles[symCircle].noteArray][ix].drawAtPoint(pt);
+			~circles.guiElements[symNoteImages][~circles[symCircle].noteArray][ix].drawAtPoint(pt);
 			if(~circles.guiElements[symNoteHits].includes(ix)){
 				Pen.color_(~circles.guiElements[symNoteHitColor][ix]);
-				Pen.addRect(Rect(pt.x, pt.y, 75, 35));
+				Pen.addRect(Rect(pt.x, pt.y, 55, 45)); // 75 35
 				Pen.fill
 			}
 		};
@@ -46,13 +51,26 @@
 	};
 };
 
+
+/*{
+var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "pngs";
+~circles.guiElements.noteImgs = (0..127).collect {|nn|
+Image.open(imgPath +/+ nn ++ ".png")
+};
+}.value;*/
 {
-	var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "pngs";
-	~circles.guiElements.noteImgs = (0..127).collect {|nn|
-		Image.open(imgPath +/+ nn ++ ".png")
+	var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_g_clef";
+	~circles.guiElements.noteImgsGClef = (0..127).collect {|nn|
+		Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
 	};
 }.value;
 
+{
+	var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_f_clef";
+	~circles.guiElements.noteImgsFClef = (0..127).collect {|nn|
+		Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
+	};
+}.value;
 
 /*~cues = (
 list: [

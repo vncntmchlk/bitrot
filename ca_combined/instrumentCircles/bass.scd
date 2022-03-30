@@ -108,7 +108,7 @@ OSCdef(\philippBassLine, {|msg|
 	};
 };
 
-~circles.bassCircle.noteFunc.();
+~circles.bassCircle.monoNoteFunc.();
 ~circles.bassCircle.sharedValues.monoMode = 1;
 ~circles.bassCircle.sharedValues.onOff = 0;
 ~circles.bassCircle.sharedValues.noteArrayLen = 16;
