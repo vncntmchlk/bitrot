@@ -117,7 +117,7 @@
 		},
 		makeRules: { |num|
 			var arr = num.asBinaryDigits.reverse;
-			("rule " ++ num).postln;
+			// ("rule " ++ num).postln;
 			//sharedEv.currentRule = num;
 			game.rules = (
 				'000': arr[0],

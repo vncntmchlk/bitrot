@@ -6,7 +6,7 @@
 	circs: ~circles.circleArray[0..2],
 	sharedValues: OSCSharedEvent.new(netAddr: ~localHost, prefix: "melodie"),
 	points: [],
-	instrumentName: "notes0",
+	instrumentName: "/notes0",
 	instrumentChan: 0,
 	taktLen: 16,
 	guiText: "MELODIE",
@@ -19,7 +19,7 @@
 	lastTime: SystemClock.seconds
 );
 
-~circles.melodieCircle.noteArray = (60..75).scramble;
+~circles.melodieCircle.noteArray = (60..75);//.scramble;
 OSCdef(\philippMelody, {|msg|
 	// msg.postln;
 	if(msg[1..].size == 16){
@@ -68,7 +68,7 @@ OSCdef(\philippMelody, {|msg|
 						~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.lastNote, 0);
 						~circles.melodieCircle[\drawNoteOff].(~circles.melodieCircle.lastIndex);
 					};
-					~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+					~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor); //.copy.alpha_(0.3)
 					//~mOut.noteOn(0, ~melodie[index], 70);
 					~toBenni.sendMsg(~circles.melodieCircle.instrumentName, ~circles.melodieCircle.noteArray[index], vel);
 					~circles.melodieCircle.lastNote = ~circles.melodieCircle.noteArray[index];
@@ -89,7 +89,7 @@ OSCdef(\philippMelody, {|msg|
 		ev.noteFunc = { |self, vel, index|
 			if(~circles.melodieCircle.sharedValues.onOff.asBoolean){
 				var offsetMidinote = [-12, 0, 12][circleIndex];
-				~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+				~circles.melodieCircle[\drawNoteOn].(index, ev.guiColor); // .copy.alpha_(0.3)
 				if(~circles.melodieCircle.sharedValues.linkToRhy1Mute.asBoolean){
 					Pdefn(\rhy1Mute).asStream.next
 				};

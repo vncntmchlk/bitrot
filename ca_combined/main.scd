@@ -13,7 +13,6 @@
 
 // drums mit delay und grains, tempo geht auch sehr schnell
 
-
 // roter buzzer fuer random massaker (von anfang das ding)
 // noch ein kreis fuer zweite melodie
 // und noch einer fuer sample sequencer (dann brauchst du auch nicht den link, theoretisch, aber egal trotzdem drin lassen weil es einfacher ist?)
@@ -23,16 +22,15 @@
 // sample loop sequencer
 // pro loop geht der fft ca einen weiter (lastvals 0 usw.)
 
-
 (
 thisProcess.openUDPPort(9010); // from open stage control
 thisProcess.openUDPPort(9000); // from rpi
 thisProcess.openUDPPort(9005); // from philipp
 // ~toBenni = NetAddr("169.254.85.142", 7401);
-~toBenni = NetAddr("192.168.1.101", 7401);
+~toBenni = NetAddr("192.168.1.101", 7402);
 ~localHost = NetAddr("127.0.0.1", 9001); // to open stage control
 ~rpiAddr = NetAddr("10.42.0.208", 9001);
-~toPhilipp = NetAddr("192.168.1.102", 9004);//NetAddr("192.168.1.102", 9004);
+~toPhilipp = NetAddr("192.168.1.104", 9004);//NetAddr("192.168.1.102", 9004);
 // ~rpiAddr = NetAddr("169.254.167.159", 9001);
 "manage_presets.scd".loadRelative;
 "oscMidiEvent.scd".loadRelative;
@@ -49,7 +47,7 @@ thisProcess.openUDPPort(9005); // from philipp
 // circle sequencer
 "resources_circle.scd".loadRelative;
 "gui_windows_circle.scd".loadRelative;
-
+// "cues.scd".loadRelative;
 // ~rpiAddr.sendMsg("/circles", 1);
 )
 
@@ -58,7 +56,6 @@ thisProcess.openUDPPort(9005); // from philipp
 ~circles.guiElements.bassWindow.bounds.origin;
 ~circles.guiElements.chordsWindow.bounds.origin;
 // USW
-Tdef(("circ0").asSymbol).quant
 ~rpiAddr.sendMsg("/circles", 0);
 ~rpiAddr.sendMsg("/circles", 1);
 
@@ -67,22 +64,23 @@ Tdef(("circ0").asSymbol).quant
 ~toBenni.sendMsg("/clips", 3)
 ~toBenni.sendMsg("/cue", 3)
 
-TempoClock.default.tempo = 2.5;
+TempoClock.default.tempo = 1;
 
 // wie kann man hier chan sinnvoll reinbringen?
 // waere auch gut wenn es zb Pseq([11, 12],inf) moeglich waere
 
-~circles.melodieCircle.presetManager[\savePreset].("gabaFull")
+~circles.melodieCircle.presetManager[\savePreset].("cue11_erinnerung")
 ~circles.melodieCircle.presetManager[\showPresetDifference].("suesseMelodie2")
-~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
-~circles.bassCircle.presetManager[\savePreset].("bassEntwicklung")
+// ~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
+~circles.melodie2Circle.presetManager[\savePreset].("basicOFF")
+~circles.bassCircle.presetManager[\savePreset].("basicOFF")
 ~gameFFT.presetManager[\savePreset].("soft_high")
 ~gameBitFlip.presetManager[\savePreset].("basicOFF")
-~rhythmPM[\savePreset].("10th")
+~rhythmPM[\savePreset].("cue8_long_slow")
 
-~circles.melodieCircle.presetManager[\savePreset].("simpleMath")
+~circles.melodieCircle.presetManager[\savePreset].("cue8_prep")
 
-
+~circles.melodieCircle.presetManager[\savePreset].("simpleArp")
 
 
 Tdef(\sampleLooper, {

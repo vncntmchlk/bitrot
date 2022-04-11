@@ -66,21 +66,15 @@ OSCdef(\resolution, { |msg|
 		waitDur: {|newWaitDur|
 			if(ev.sharedValues.onOff.asBoolean){
 				var tdefQuant = newWaitDur * ev.sharedValues.loopSpeedLevel / 4;
-				/*ev.taktIndex = 0;*/
 				Tdef(("circ" ++ circleNum).asSymbol).quant_(tdefQuant);
 				Tdef(("circ" ++ circleNum).asSymbol, ev[\tdefLoopFunc]);
-				//Tdef(("circ" ++ circleNum).asSymbol).stop;
-				//Tdef(("circ" ++ circleNum).asSymbol).play(TempoClock.default, doReset: true, quant: [tdefQuant,0,-0.025]);
 			}
 		},
 		loopSpeedLevel: {|newSpeed|
 			if(ev.sharedValues.onOff.asBoolean){
 				var tdefQuant = ev.sharedValues.waitDur * newSpeed / 4;
-				//ev.taktIndex = 0;
 				Tdef(("circ" ++ circleNum).asSymbol).quant_(tdefQuant);
 				Tdef(("circ" ++ circleNum).asSymbol, ev[\tdefLoopFunc]);
-				//Tdef(("circ" ++ circleNum).asSymbol).stop;
-				//Tdef(("circ" ++ circleNum).asSymbol).play(TempoClock.default, doReset: true, quant: [tdefQuant,0,-0.025]);
 			}
 		}
 	));
@@ -94,8 +88,6 @@ OSCdef(\resolution, { |msg|
 			var waitRate;
 			var hits = Set.new;
 			var circleSlice;
-			// auch noch ein hits Set fuer melodiecircle usw. ?
-			// 360 / 16
 			if(ev.taktIndex == 0){
 				if(~circles[symCircle].sharedValues.noteArrayLen != ~circles[symCircle].taktLen){
 					~circles[symCircle].taktLen = ~circles[symCircle].sharedValues.noteArrayLen.copy;
@@ -122,7 +114,7 @@ OSCdef(\resolution, { |msg|
 					hits.add(
 						ang[0]
 						.linlin(0,360,0, ev.taktLen - 0.001)
-						.round(1)
+						// .round(1)
 						.clip(0, ev.taktLen - 1)
 						.asInteger
 					);
@@ -144,63 +136,10 @@ OSCdef(\resolution, { |msg|
 		}
 	};
 	Tdef(("circ" ++ circleNum).asSymbol, ev[\tdefLoopFunc]);
-	/*	Tdef(("circ" ++ circleNum).asSymbol, {
-	loop {
-	var waitRate;
-	var hits = Set.new;
-	var circleSlice;
-	// auch noch ein hits Set fuer melodiecircle usw. ?
-	// 360 / 16
-	if(ev.taktIndex == 0){
-	if(~circles[symCircle].sharedValues.noteArrayLen != ~circles[symCircle].taktLen){
-	~circles[symCircle].taktLen = ~circles[symCircle].sharedValues.noteArrayLen.copy;
-	{~circles.guiElements[symNotesView].refresh}.defer
-	};
-	if(ev.taktLen != ~circles[symCircle].taktLen){
-	ev.taktLen = ~circles[symCircle].taktLen.copy;
-	};
-	if(ev.sharedValues.muteEveryX > 0){
-	ev.muteNow = (ev.muteCount % ev.sharedValues.muteEveryX) == (ev.sharedValues.muteEveryX - 1);
-	ev.muteCount = ev.muteCount + 1
-	}{
-	ev.muteNow = false
-	}
-	};
-	waitRate = (ev.sharedValues.waitDur / 4 * ev.sharedValues.loopSpeedLevel) / ev.taktLen;
-	circleSlice = 360 / ev.taktLen;
-	ev.testAngle = ev.taktIndex * circleSlice;
-
-	// intersections in die taktIndices einteilen
-	if(ev.intersections.notNil && ev.muteNow.not){
-	ev.intersections.do {|ang, ix|
-	hits.add(
-	ang[0]
-	.linlin(0,360,0, ev.taktLen - 0.001)
-	.round(1)
-	.clip(0, ev.taktLen - 1)
-	.asInteger
-	);
-	};
-	if(hits.includes(ev.taktIndex)){
-	// var velocityOfCircle = (i % 90).fold2(45).linlin(0,44,10,127);
-	// var velocityOfClock = ~circles.quantAmps[thisThread.beats.mod(4)];
-	ev.guiHit = 24;
-	ev.noteFunc(100, ev.taktIndex);
-	};
-	// einer vor taktIndex
-	if(hits.includes((ev.taktIndex + 1) % ev.taktLen)){
-	ev.sendIndexFunc((ev.taktIndex + 1) % ev.taktLen)
-	};
-	//[circleNum, hits, ev.taktIndex].postln;
-	};
-	ev.taktIndex = (ev.taktIndex + 1) % ev.taktLen;
-	waitRate.wait;
-	}
-	});*/
 	ev
 };
 
-["melodie", "bass", "chords"].do {|str|
+["melodie", "bass", "melodie2"].do {|str|
 	("instrumentCircles" +/+ str ++ ".scd").loadRelative
 };
 
@@ -213,7 +152,7 @@ OSCdef(\points,{|msg|
 		};
 		// angles.postln
 	};
-	[~circles.melodieCircle, ~circles.bassCircle, ~circles.chordsCircle].do { |instrumentCircle|
+	[~circles.melodieCircle, ~circles.bassCircle, ~circles.melodie2Circle].do { |instrumentCircle|
 		if(instrumentCircle.sharedValues.freezeMe.asBoolean.not){
 			instrumentCircle.points = points;
 			instrumentCircle.circs.do {|ci| ci.getIntersections(angles)}

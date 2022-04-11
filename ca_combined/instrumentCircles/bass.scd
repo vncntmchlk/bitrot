@@ -6,7 +6,7 @@
 	circs: ~circles.circleArray[3..4],
 	sharedValues: OSCSharedEvent.new(netAddr: ~localHost, prefix: "bass"),
 	points: [],
-	instrumentName: "notes2",
+	instrumentName: "/notes2",
 	instrumentChan: 2,
 	taktLen: 16,
 	guiText: "BASS",

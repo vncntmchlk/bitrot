@@ -52,7 +52,7 @@
 	};*/
 	ev.makeRules = { |num|
 		var arr = num.asBinaryDigits.reverse;
-		("rule " ++ num).postln;
+		// ("rule " ++ num).postln;
 		ev.rules = (
 			'000': arr[0],
 			'001': arr[1],
