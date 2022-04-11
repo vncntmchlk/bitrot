@@ -37,7 +37,7 @@ OSCdef(\philippMelodie2, {|msg|
 		~circles.melodie2Circle.noteArray = msg[1..];
 	}
 }, "/melody2List").fix;
-~circles.melodie2Circle.noteArray = (56..71);
+~circles.melodie2Circle.noteArray = (48..63);
 ~circles.melodie2Circle.blockedIndices = Set.new();
 
 ~circles.melodie2Circle.drawNoteOn = { |index, color|
@@ -66,7 +66,7 @@ OSCdef(\philippMelodie2, {|msg|
 						~toBenni.sendMsg(~circles.melodie2Circle.instrumentName, ~circles.melodie2Circle.lastNote, 0);
 						~circles.melodie2Circle[\drawNoteOff].(~circles.melodie2Circle.lastIndex);
 					};
-					~circles.melodie2Circle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+					~circles.melodie2Circle[\drawNoteOn].(index, ev.guiColor); //.copy.alpha_(0.3)
 					//~mOut.noteOn(0, ~melodie[index], 70);
 					~toBenni.sendMsg(~circles.melodie2Circle.instrumentName, ~circles.melodie2Circle.noteArray[index], vel);
 					~circles.melodie2Circle.lastNote = ~circles.melodie2Circle.noteArray[index];
@@ -87,7 +87,7 @@ OSCdef(\philippMelodie2, {|msg|
 		ev.noteFunc = { |self, vel, index|
 			if(~circles.melodie2Circle.sharedValues.onOff.asBoolean){
 				var offsetMidinote = [-12, 0, 12][circleIndex];
-				~circles.melodie2Circle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+				~circles.melodie2Circle[\drawNoteOn].(index, ev.guiColor); //.copy.alpha_(0.3)
 				if(~circles.melodie2Circle.sharedValues.linkToRhy1Mute.asBoolean){
 					Pdefn(\rhy1Mute).asStream.next
 				};

@@ -1,0 +1,44 @@
+var o, p;
+o = [
+	Event.prNew,  Array.prNew(16),  Dictionary.prNew,  Array.prNew(24),  
+	Dictionary.prNew,  Array.prNew(24),  Dictionary.prNew,  Array.prNew(24)
+];
+p = [
+	// Event
+	0, [ array: o[1],  size: 3,  
+		proto: nil,  parent: nil,  
+		know: true ],  
+	// Array
+	1, [ nil,  nil,  nil,  nil,  
+		'~circles.circleArray[6].sharedValues',  o[2],  nil,  nil,  
+		nil,  nil,  '~circles.melodie2Circle.sharedValues',  o[4],  
+		'~circles.circleArray[5].sharedValues',  o[6],  nil,  nil ],  
+	// Dictionary
+	2, [ array: o[3],  size: 6 ],  
+	// Array
+	3, [ nil,  nil,  nil,  nil,  
+		'waitDur',  4.0,  'fade',  0,  
+		nil,  nil,  nil,  nil,  
+		'muteEveryX',  0,  'onOff',  1,  
+		'circleLegato',  0.125,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ],  
+	// Dictionary
+	4, [ array: o[5],  size: 6 ],  
+	// Array
+	5, [ 'noteArrayLen',  16,  'monoMode',  0,  
+		'linkToRhy1Mute',  0,  nil,  nil,  
+		nil,  nil,  'freezeMe',  0,  
+		nil,  nil,  'onOff',  1,  
+		'linkToClipSeq',  0,  nil,  nil,  
+		nil,  nil,  nil,  nil ],  
+	// Dictionary
+	6, [ array: o[7],  size: 6 ],  
+	// Array
+	7, [ nil,  nil,  nil,  nil,  
+		'waitDur',  8,  'fade',  0,  
+		nil,  nil,  nil,  nil,  
+		'muteEveryX',  0,  'onOff',  1,  
+		'circleLegato',  0.125,  nil,  nil,  
+		'loopSpeedLevel',  1,  nil,  nil ]
+];
+prUnarchive(o,p);

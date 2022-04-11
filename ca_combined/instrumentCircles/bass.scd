@@ -38,7 +38,7 @@ OSCdef(\philippBassLine, {|msg|
 		~circles.bassCircle.noteArray = msg[1..];
 	}
 }, "/bassList").fix;
-~circles.bassCircle.noteArray = (36..51);
+~circles.bassCircle.noteArray = (24..39);
 ~circles.bassCircle.blockedIndices = Set.new();
 
 ~circles.bassCircle.drawNoteOn = { |index, color|
@@ -67,7 +67,7 @@ OSCdef(\philippBassLine, {|msg|
 						~toBenni.sendMsg(~circles.bassCircle.instrumentName, ~circles.bassCircle.lastNote, 0);
 						~circles.bassCircle[\drawNoteOff].(~circles.bassCircle.lastIndex);
 					};
-					~circles.bassCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+					~circles.bassCircle[\drawNoteOn].(index, ev.guiColor); //.copy.alpha_(0.3)
 					//~mOut.noteOn(0, ~melodie[index], 70);
 					~toBenni.sendMsg(~circles.bassCircle.instrumentName, ~circles.bassCircle.noteArray[index], vel);
 					~circles.bassCircle.lastNote = ~circles.bassCircle.noteArray[index];
@@ -87,7 +87,7 @@ OSCdef(\philippBassLine, {|msg|
 	~circles.circleArray[3..4].do {|ev|
 		ev.noteFunc = { |self, vel, index|
 			if(~circles.bassCircle.sharedValues.onOff.asBoolean){
-				~circles.bassCircle[\drawNoteOn].(index, ev.guiColor.copy.alpha_(0.3));
+				~circles.bassCircle[\drawNoteOn].(index, ev.guiColor); //.copy.alpha_(0.3)
 				if(~circles.bassCircle.sharedValues.linkToRhy1Mute.asBoolean){
 					Pdefn(\rhy1Mute).asStream.next
 				};

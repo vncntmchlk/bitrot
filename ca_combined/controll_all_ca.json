@@ -3132,6 +3132,7 @@
             "align": "center",
             "values": {
               "10th": "10th",
+              "bitflip_linked_zerfressen": "bitflip_linked_zerfressen",
               "16th": "16th",
               "cue8_long_slow": "cue8_long_slow",
               "basicOFF": "basicOFF"
@@ -7303,6 +7304,7 @@
             "icon": "true",
             "align": "center",
             "values": {
+              "magic_arp": "magic_arp",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -8192,6 +8194,7 @@
             "css": "",
             "values": {
               "10th": "10th",
+              "bitflip_linked_zerfressen": "bitflip_linked_zerfressen",
               "16th": "16th",
               "cue8_long_slow": "cue8_long_slow",
               "basicOFF": "basicOFF"
@@ -8388,6 +8391,7 @@
             "html": "",
             "css": "",
             "values": {
+              "magic_arp": "magic_arp",
               "basicOFF": "basicOFF"
             },
             "value": "",

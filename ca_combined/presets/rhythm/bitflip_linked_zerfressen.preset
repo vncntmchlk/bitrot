@@ -1,0 +1,69 @@
+var o, p;
+o = [
+	Event.prNew,  Array.prNew(8),  Dictionary.prNew,  Array.prNew(96),  
+	Dictionary.prNew,  Array.prNew(96)
+];
+p = [
+	// Event
+	0, [ array: o[1],  size: 2,  
+		proto: nil,  parent: nil,  
+		know: true ],  
+	// Array
+	1, [ nil,  nil,  nil,  nil,  
+		'~game1.sharedEv',  o[2],  '~game2.sharedEv',  o[4] ],  
+	// Dictionary
+	2, [ array: o[3],  size: 24 ],  
+	// Array
+	3, [ 'buttons/13',  0,  'buttons/0',  0,  
+		'caSize',  16,  'buttons/15',  0,  
+		nil,  nil,  'buttons/5',  1.0,  
+		nil,  nil,  'currentRule',  121,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/4',  0,  'buttons/6',  0,  
+		'pulseSpeed',  8,  'buttons/3',  0,  
+		nil,  nil,  'onOff',  1.0,  
+		nil,  nil,  'buttons/11',  0,  
+		nil,  nil,  'buttons/9',  0,  
+		'buttons/2',  0,  'buttons/8',  0,  
+		'loopOnOff',  1.0,  'buttons/10',  1.0,  
+		'buttons/1',  1.0,  'linkBitFlip',  1,  
+		'loopEvery',  2,  'buttons/14',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'buttons/12',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/7',  0,  nil,  nil,  
+		nil,  nil,  'linkFFTCa',  0 ],  
+	// Dictionary
+	4, [ array: o[5],  size: 24 ],  
+	// Array
+	5, [ 'buttons/13',  0,  'buttons/0',  0,  
+		'caSize',  8,  'buttons/15',  0,  
+		nil,  nil,  'buttons/5',  0,  
+		nil,  nil,  'currentRule',  110,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/4',  0,  'buttons/6',  0,  
+		'pulseSpeed',  8,  'buttons/3',  1.0,  
+		nil,  nil,  'onOff',  1.0,  
+		nil,  nil,  'buttons/11',  0,  
+		nil,  nil,  'buttons/9',  0,  
+		'buttons/2',  0,  'buttons/8',  0,  
+		'loopOnOff',  1.0,  'buttons/10',  0,  
+		'buttons/1',  0,  'linkBitFlip',  1,  
+		'loopEvery',  4,  'buttons/14',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'buttons/12',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'buttons/7',  0,  nil,  nil,  
+		nil,  nil,  'linkFFTCa',  0 ]
+];
+prUnarchive(o,p);

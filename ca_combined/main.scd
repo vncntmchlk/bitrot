@@ -21,13 +21,17 @@
 
 // sample loop sequencer
 // pro loop geht der fft ca einen weiter (lastvals 0 usw.)
+// ~toBenni = NetAddr("192.168.1.101", 7402); // PORT
+
+// durchzappen, zb die sample 1 mit fft beats dings zu den magic dings hin und her duch kombinierte presets
+
 
 (
 thisProcess.openUDPPort(9010); // from open stage control
 thisProcess.openUDPPort(9000); // from rpi
 thisProcess.openUDPPort(9005); // from philipp
 // ~toBenni = NetAddr("169.254.85.142", 7401);
-~toBenni = NetAddr("192.168.1.101", 7402);
+~toBenni = NetAddr("192.168.1.102", 7402); // PORT
 ~localHost = NetAddr("127.0.0.1", 9001); // to open stage control
 ~rpiAddr = NetAddr("10.42.0.208", 9001);
 ~toPhilipp = NetAddr("192.168.1.104", 9004);//NetAddr("192.168.1.102", 9004);
@@ -47,7 +51,7 @@ thisProcess.openUDPPort(9005); // from philipp
 // circle sequencer
 "resources_circle.scd".loadRelative;
 "gui_windows_circle.scd".loadRelative;
-// "cues.scd".loadRelative;
+"cuePlan_to_gui.scd".loadRelative;
 // ~rpiAddr.sendMsg("/circles", 1);
 )
 
@@ -72,11 +76,11 @@ TempoClock.default.tempo = 1;
 ~circles.melodieCircle.presetManager[\savePreset].("cue11_erinnerung")
 ~circles.melodieCircle.presetManager[\showPresetDifference].("suesseMelodie2")
 // ~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
-~circles.melodie2Circle.presetManager[\savePreset].("basicOFF")
+~circles.melodie2Circle.presetManager[\savePreset].("magic_arp")
 ~circles.bassCircle.presetManager[\savePreset].("basicOFF")
 ~gameFFT.presetManager[\savePreset].("soft_high")
 ~gameBitFlip.presetManager[\savePreset].("basicOFF")
-~rhythmPM[\savePreset].("cue8_long_slow")
+~rhythmPM[\savePreset].("bitflip_linked_zerfressen")
 
 ~circles.melodieCircle.presetManager[\savePreset].("cue8_prep")
 
