@@ -16,24 +16,28 @@
 	ev.sharedEv.loopEvery = 1;
 	ev.linkFunc = Pfunc{0};
 	ev.makeLinkToFFTCa = {|onOff|
+		~gameFFT[\windowOnOff].(onOff.asBoolean, prefix.asSymbol);
 		if(onOff.asBoolean){
 			~gameFFT.seedMe;
-			{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
+			~gameFFT.sharedEv.tdefOnOff = 0;
+			//{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
 			ev.linkFunc = Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0};
 		}{
-			{~gameFFT.pointerToWindow.visible_(false)}.fork(AppClock);
+			//{~gameFFT.pointerToWindow.visible_(false)}.fork(AppClock);
 			ev.linkFunc = Pfunc{0};
 		};
 	};
 	ev.makeLinkToBitFlip = {|onOff|
+		~gameBitFlip[\windowOnOff].(onOff.asBoolean, prefix.asSymbol);
 		if(onOff.asBoolean){
 			~gameBitFlip.seedMe;
-			{~gameBitFlip.pointerToWindow.visible_(true)}.fork(AppClock);
+			~gameBitFlip.sharedEv.tdefOnOff = 0;
+			//{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
 			ev.linkFunc = Pfunc{|ev| if(ev.amp > 0){Pdefn(\bitflipNext).asStream.next};0};
 		}{
-			{~gameBitFlip.pointerToWindow.visible_(false)}.fork(AppClock);
+			//{~gameFFT.pointerToWindow.visible_(false)}.fork(AppClock);
 			ev.linkFunc = Pfunc{0};
-		};
+		}
 	};
 
 	ev.buttonStates = 0 ! ev.maxSize;
@@ -45,14 +49,8 @@
 		}
 	};
 
-	/*ev.maxSize.do { |i|
-	OSCdef((prefix ++ 'button' ++ i).asSymbol, { |msg|
-	ev.buttonStates[i] = msg[1].asInteger;
-	},"/" +/+ prefix +/+ "buttons/" ++ i).fix
-	};*/
 	ev.makeRules = { |num|
 		var arr = num.asBinaryDigits.reverse;
-		// ("rule " ++ num).postln;
 		ev.rules = (
 			'000': arr[0],
 			'001': arr[1],
@@ -90,8 +88,7 @@
 		(newSize .. (ev.nextLevel.size - 1)).do {|i|
 			ev.nextLevel[i] = nil;
 		};
-		//ev.sharedEv.caSize = newSize;
-		{ev.resizeWin}.defer(0.1);
+		{ev.resizeWin}.defer;//(0.1);
 	};
 
 	ev.resizeWin = {
@@ -135,12 +132,14 @@
 	ev.gameBlockSize = 40;
 	ev.gameBlockRow = 40 / 1.61803398875;
 	ev.gameBlockCol = 40;
-	ev.win = Window.new(prefix, bounds:(ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow));
+	ev.win = Window.new(prefix, bounds:(ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow), border: ~guiBorder)
+	.background_(~guiBackgroundColor)
+	.autoRememberPosition(\bitrot, prefix.asSymbol);
 	if(frontWindow){
 		ev.win.front;
 	};
 	ev.view = UserView.new(ev.win, (ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow));
-	ev.view.background_(Color.black);
+	// ev.view.background_(~guiBackgroundColor);
 	ev.view.clearOnRefresh = false;
 	ev.drawIndex = 0;
 	ev.hitColor = \red;

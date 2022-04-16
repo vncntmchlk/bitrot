@@ -4,7 +4,6 @@
 ~circles.guiElements.noteMapping = (0, 12 .. 120).collect (_ + Scale.major.degrees).flat;
 
 
-
 ["melodie", "bass", "melodie2"].do { |name|
 	var symWindow = (name ++ "Window").asSymbol;
 	var symCircle = (name ++ "Circle").asSymbol;
@@ -12,14 +11,14 @@
 	var symNotesView = (name ++ "NotesView").asSymbol;
 	var symNoteHits = (name ++ "NoteHits").asSymbol;
 	var symNoteHitColor = (name ++ "NoteHitColor").asSymbol;
-	var makeWindowBigger = 300;
+	var makeWindowBigger = 0; //300
 
 	var center;
 	var innerRad = 250;
-	var noteLines = 24;
+	var noteLines = 31;
 	var lineDist = 5;
 	var lineAlphaMap = Env([0.1,0.5,0.1],[1,1]).asSignal(noteLines);
-	var midinoteLineOffset = (bass: 0, melodie: 12, melodie2: 0)[name.asSymbol];
+	var midinoteLineOffset = (bass: 24, melodie: 24, melodie2: 17)[name.asSymbol];
 	var drawWedge = { |startAngle, sweepLength, hit, hitColor|
 		noteLines.do{ |i|
 			Pen.addAnnularWedge(
@@ -39,9 +38,10 @@
 		}
 	};
 
-
-	~circles.guiElements[symWindow] = Window(name, Rect(0, 0, ~circles.guiElements.res2[1] + makeWindowBigger,~circles.guiElements.res2[0] + makeWindowBigger));
-	~circles.guiElements[symWindow].view.background = Color.black;
+	~circles.guiElements[symWindow] = Window(name,
+		Rect(0, 0, ~circles.guiElements.res2[1] + makeWindowBigger,~circles.guiElements.res2[0] + makeWindowBigger), false, ~guiBorder
+	).autoRememberPosition(\bitrot, name.asSymbol);
+	~circles.guiElements[symWindow].view.background = ~guiBackgroundColor;
 	~circles[symCircle].view = UserView(
 		~circles.guiElements[symWindow],
 		Rect(makeWindowBigger/2, makeWindowBigger/2, ~circles.guiElements.res2[1], ~circles.guiElements.res2[0])).background_(Color.gray(0,0)
@@ -55,48 +55,53 @@
 		Rect(0, 0, ~circles.guiElements.res2[1] + makeWindowBigger,~circles.guiElements.res2[0] + makeWindowBigger)
 	);
 
-	center = ((~circles.guiElements.res2[1] + makeWindowBigger)/2 + 0)@((~circles.guiElements.res2[0] + makeWindowBigger/2) + 0);
+	center = ((~circles.guiElements.res2[1] + makeWindowBigger)/1 + 0)@((~circles.guiElements.res2[0] + makeWindowBigger/1) + 0);
 
 	~circles.guiElements[symNoteHits] = Set.new;
 	~circles.guiElements[symNoteHitColor] = Color.red(0.5,0.2) ! 16;
 	~circles.guiElements[symNotesView].drawFunc= {
-		~circles[symCircle].taktLen.do {|ix|
-			var startAng = (ix * (360 / ~circles[symCircle].taktLen) - 180).degrad;
-			var midinn = ~circles[symCircle].noteArray[ix];
-			var sweep =  (360 / ~circles[symCircle].taktLen).degrad;
-			var hitColor = if(~circles.guiElements[symNoteHits].includes(ix)){
-				~circles.guiElements[symNoteHitColor][ix]
-			}{
-				Color.grey(1,0.75)
+		Pen.use {
+			Pen.scale(0.5, 0.5);
+			~circles[symCircle].taktLen.do {|ix|
+				var startAng = (ix * (360 / ~circles[symCircle].taktLen) - 180).degrad;
+				var midinn = ~circles[symCircle].noteArray[ix];
+				var sweep =  (360 / ~circles[symCircle].taktLen).degrad;
+				var hitColor = if(~circles.guiElements[symNoteHits].includes(ix)){
+					~circles.guiElements[symNoteHitColor][ix]
+				}{
+					Color.grey(1,0.75)
+				};
+				// set the Color
+
+				drawWedge.(startAng, sweep, (midinn - noteLines - midinoteLineOffset) % noteLines, hitColor)
+				// (midinn - noteLines) % noteLines -> 60 ist in der mitte
+				// (midinn - noteLines - 12) % noteLines -> 60 ist unten
 			};
-			// set the Color
-			drawWedge.(startAng, sweep, (midinn - noteLines - midinoteLineOffset) % noteLines, hitColor)
-			// (midinn - noteLines) % noteLines -> 60 ist in der mitte
-			// (midinn - noteLines - 12) % noteLines -> 60 ist unten
 		};
 	};
 };
 
 /*{
-	var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_g_clef";
-	~circles.guiElements.noteImgsGClef = (0..127).collect {|nn|
-		Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
-	};
+var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_g_clef";
+~circles.guiElements.noteImgsGClef = (0..127).collect {|nn|
+Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
+};
 }.value;
 
 {
-	var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_f_clef";
-	~circles.guiElements.noteImgsFClef = (0..127).collect {|nn|
-		Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
-	};
+var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_f_clef";
+~circles.guiElements.noteImgsFClef = (0..127).collect {|nn|
+Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
+};
 }.value;*/
 
 [~circles.melodieCircle, ~circles.bassCircle, ~circles.melodie2Circle].do {|instrumentCircle|
 	instrumentCircle.view.drawFunc = {
-		Pen.scale(2,2);
+		// Pen.scale(2,2);
 		Pen.stringAtPoint(instrumentCircle.guiText, 4@5, Font("Hack", 16), Color.white);
 		Pen.use {
 			var hits = List.new;
+			Pen.translate(instrumentCircle.view.bounds.size.width * 0.25, instrumentCircle.view.bounds.size.height * 0.25);
 			instrumentCircle.circs.do { |ci|
 				if(ci.sharedValues.onOff.asBoolean){
 					Pen.color = Color.grey(1, 0.4);

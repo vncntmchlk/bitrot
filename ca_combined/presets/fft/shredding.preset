@@ -13,15 +13,15 @@ p = [
 	// Dictionary
 	2, [ array: o[3],  size: 8 ],  
 	// Array
-	3, [ 'lastValuesSize',  1,  'caSize',  16,  
-		'blendSteps',  10,  'tdefOnOff',  0,  
-		'blockOrPass',  0,  nil,  nil,  
+	3, [ 'lastValuesSize',  8,  'caSize',  16,  
+		'blendSteps',  4,  'tdefOnOff',  1.0,  
+		'blockOrPass',  1.0,  nil,  nil,  
 		nil,  nil,  'currentRule',  30,  
-		'sendRate',  1.0,  nil,  nil,  
+		'sendRate',  0.25,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  'caRange',  o[4] ],  
 	// Array
-	4, [ 0,  5 ]
+	4, [ 1,  4 ]
 ];
 prUnarchive(o,p);

@@ -9,7 +9,7 @@
 	instrumentName: "/notes1",
 	instrumentChan: 1,
 	taktLen: 16,
-	guiText: "MELODIE2",
+	guiText: "M-2",
 	presetManager: ~makePresetManager.("melodie2",[
 		"~circles.melodie2Circle.sharedValues",
 		"~circles.circleArray[5].sharedValues",
@@ -23,10 +23,10 @@
 	ev.sendIndexFunc = { |self, index|
 		if(~circles.melodie2Circle.sharedValues.onOff.asBoolean){
 			var now = SystemClock.seconds;
-			if((now - ~circles.melodie2Circle.lastTime) > minTimeInBetween){
-				~toPhilipp.sendMsg("/melody2Index", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
-				~circles.melodie2Circle.lastTime = now
-			}
+			//if((now - ~circles.melodie2Circle.lastTime) > minTimeInBetween){
+			~toPhilipp.sendMsg("/melody2Index", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+			~circles.melodie2Circle.lastTime = now
+			//}
 		}
 	}
 };

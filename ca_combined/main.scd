@@ -5,28 +5,23 @@
 // vm -> benni
 // vm -> philipp, philipp -> vm
 
-// formteile
-// atmo, durch ca geschmeidig geaendert
-// aenderung wird ruckartig
-// dann kommen drum die das uebernehmen
-// dann atmo raus
-
-// drums mit delay und grains, tempo geht auch sehr schnell
-
 // roter buzzer fuer random massaker (von anfang das ding)
-// noch ein kreis fuer zweite melodie
-// und noch einer fuer sample sequencer (dann brauchst du auch nicht den link, theoretisch, aber egal trotzdem drin lassen weil es einfacher ist?)
 
 //gaba preset: 10th und accelerando zu tempo clock 2.5, schnelle melodie kommt spaeter dazu
 
-// sample loop sequencer
-// pro loop geht der fft ca einen weiter (lastvals 0 usw.)
-// ~toBenni = NetAddr("192.168.1.101", 7402); // PORT
-
 // durchzappen, zb die sample 1 mit fft beats dings zu den magic dings hin und her duch kombinierte presets
 
+~toBenni = NetAddr("192.168.1.101", 7401); // PORT
 
+// bei 22 clicks und clips aus, melodie 1 auch
+// die links duerfen nicht gegenseitig die windows ausschalten, brauch ein globas set oder so
+
+// block or pass quantisiert aendern bei den fft loechern
+// topEnvironment[\toBenni].sendMsg("/bitrotData", "fftXbins", *[16, 32, 64, 128, 256]);
+bei 22 ein kombinierten cue der alles umschaltet
 (
+~guiBorder = true;
+~guiBackgroundColor = Color.grey(0, 0); // Color.grey(0, 0);
 thisProcess.openUDPPort(9010); // from open stage control
 thisProcess.openUDPPort(9000); // from rpi
 thisProcess.openUDPPort(9005); // from philipp
@@ -42,6 +37,7 @@ thisProcess.openUDPPort(9005); // from philipp
 "resources_ca_fft.scd".loadRelative;
 "resources_ca_bitflip.scd".loadRelative;
 "resources_clip_launcher.scd".loadRelative;
+// "resources_scope.scd".loadRelative;
 ~game1 = ~newCaRhythm.((), prefix: "rhy1");
 ~game2 = ~newCaRhythm.((), prefix: "rhy2");
 ~game2.hitColor = \blue;
@@ -53,12 +49,17 @@ thisProcess.openUDPPort(9005); // from philipp
 "gui_windows_circle.scd".loadRelative;
 "cuePlan_to_gui.scd".loadRelative;
 // ~rpiAddr.sendMsg("/circles", 1);
+~tempoSharedEv = OSCSharedEvent.new(~localhost);
+~tempoSharedEv.tempo = 1;
+~tempoSharedEv.makeOSCdefsForKeys((
+	tempo: { |val|
+		TempoClock.default.tempo = val;
+	}
+));
+~buzzerStuff.resetValues
 )
 
-// um aktuelle window konfiguration zu kriegen:
-~circles.guiElements.melodieWindow.bounds.origin;
-~circles.guiElements.bassWindow.bounds.origin;
-~circles.guiElements.chordsWindow.bounds.origin;
+
 // USW
 ~rpiAddr.sendMsg("/circles", 0);
 ~rpiAddr.sendMsg("/circles", 1);
@@ -73,60 +74,21 @@ TempoClock.default.tempo = 1;
 // wie kann man hier chan sinnvoll reinbringen?
 // waere auch gut wenn es zb Pseq([11, 12],inf) moeglich waere
 
-~circles.melodieCircle.presetManager[\savePreset].("cue11_erinnerung")
+~circles.melodieCircle.presetManager[\savePreset].("accelZusammen")
+~circles.melodie2Circle.presetManager[\savePreset].("accelZusammen")
+~circles.bassCircle.presetManager[\loadPreset].("benniSolo")
+
+
+~circles.melodieCircle.presetManager[\savePreset].("kuckkucksNest")
 ~circles.melodieCircle.presetManager[\showPresetDifference].("suesseMelodie2")
 // ~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
 ~circles.melodie2Circle.presetManager[\savePreset].("magic_arp")
-~circles.bassCircle.presetManager[\savePreset].("basicOFF")
-~gameFFT.presetManager[\savePreset].("soft_high")
-~gameBitFlip.presetManager[\savePreset].("basicOFF")
-~rhythmPM[\savePreset].("bitflip_linked_zerfressen")
+~circles.bassCircle.presetManager[\savePreset].("benniSolo")
+~gameFFT.presetManager[\savePreset].("shredding")
+~gameBitFlip.presetManager[\savePreset].("shredRegular")
+~rhythmPM[\savePreset].("shredding")
 
 ~circles.melodieCircle.presetManager[\savePreset].("cue8_prep")
 
 ~circles.melodieCircle.presetManager[\savePreset].("simpleArp")
 
-
-Tdef(\sampleLooper, {
-	loop {
-		~toBenni.sendMsg("/clips", 7);
-		4.wait;
-		Pdefn(\caFFTNext).asStream.next;
-	}
-}).play
-
-~gameFFT.seedMe;
-{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
-
-
-Tdef(\sampleLooper, {
-	loop {
-		~toBenni.sendMsg("/clips", 7);
-		2.wait;
-		Pdefn(\caFFTNext).asStream.next;
-	}
-})
-Tdef(\sampleLooper).stop
-Tdef(\sampleLooper, {
-	loop {
-		~toBenni.sendMsg("/clips", 7);
-		1.wait;
-		Pdefn(\caFFTNext).asStream.next;
-	}
-})
-
-Tdef(\sampleLooper, {
-	loop {
-		~toBenni.sendMsg("/clips", 7);
-		0.25.wait;
-		Pdefn(\caFFTNext).asStream.next;
-	}
-})
-
-Tdef(\sampleLooper, {
-	loop {
-		~toBenni.sendMsg("/clips", 7);
-		8.wait;
-		// Pdefn(\caFFTNext).asStream.next;
-	}
-}).play

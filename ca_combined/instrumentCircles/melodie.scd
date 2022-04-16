@@ -9,7 +9,7 @@
 	instrumentName: "/notes0",
 	instrumentChan: 0,
 	taktLen: 16,
-	guiText: "MELODIE",
+	guiText: "M",
 	presetManager: ~makePresetManager.("melodie",[
 		"~circles.melodieCircle.sharedValues",
 		"~circles.circleArray[0].sharedValues",
@@ -19,7 +19,7 @@
 	lastTime: SystemClock.seconds
 );
 
-~circles.melodieCircle.noteArray = (60..75);//.scramble;
+~circles.melodieCircle.noteArray = (55..70);//.scramble;
 OSCdef(\philippMelody, {|msg|
 	// msg.postln;
 	if(msg[1..].size == 16){
@@ -32,10 +32,10 @@ OSCdef(\philippMelody, {|msg|
 	ev.sendIndexFunc = { |self, index|
 		if(~circles.melodieCircle.sharedValues.onOff.asBoolean){
 			var now = SystemClock.seconds;
-			if((now - ~circles.melodieCircle.lastTime) > minTimeInBetween){
-				~toPhilipp.sendMsg("/melodyIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
-				~circles.melodieCircle.lastTime = now
-			}
+			//if((now - ~circles.melodieCircle.lastTime) > minTimeInBetween){
+			~toPhilipp.sendMsg("/melodyIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+			~circles.melodieCircle.lastTime = now
+			//}
 		}
 	}
 };

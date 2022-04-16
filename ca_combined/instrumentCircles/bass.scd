@@ -9,7 +9,7 @@
 	instrumentName: "/notes2",
 	instrumentChan: 2,
 	taktLen: 16,
-	guiText: "BASS",
+	guiText: "B",
 	presetManager: ~makePresetManager.("bass",[
 		"~circles.bassCircle.sharedValues",
 		"~circles.circleArray[3].sharedValues",
@@ -23,10 +23,10 @@
 	ev.sendIndexFunc = { |self, index|
 		if(~circles.bassCircle.sharedValues.onOff.asBoolean){
 			var now = SystemClock.seconds;
-			if((now - ~circles.bassCircle.lastTime) > minTimeInBetween){
-				~toPhilipp.sendMsg("/bassIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
-				~circles.bassCircle.lastTime = now
-			}
+			//if((now - ~circles.bassCircle.lastTime) > minTimeInBetween){
+			~toPhilipp.sendMsg("/bassIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+			~circles.bassCircle.lastTime = now
+			//}
 		}
 	}
 };

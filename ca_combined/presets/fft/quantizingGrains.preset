@@ -14,14 +14,14 @@ p = [
 	2, [ array: o[3],  size: 8 ],  
 	// Array
 	3, [ 'lastValuesSize',  1,  'caSize',  16,  
-		'blendSteps',  10,  'tdefOnOff',  0,  
-		'blockOrPass',  0,  nil,  nil,  
+		'blendSteps',  1,  'tdefOnOff',  0.0,  
+		'blockOrPass',  1.0,  nil,  nil,  
 		nil,  nil,  'currentRule',  30,  
-		'sendRate',  1.0,  nil,  nil,  
+		'sendRate',  4.0,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  'caRange',  o[4] ],  
 	// Array
-	4, [ 0,  5 ]
+	4, [ 0,  4 ]
 ];
 prUnarchive(o,p);

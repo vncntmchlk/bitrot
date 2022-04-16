@@ -12,11 +12,12 @@
 	sharedEv.caRange = [0, 9];
 	sharedEv.tdefOnOff = 0;
 
-	win = Window.new("bitflip", bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize));
+	win = Window.new(prefix, bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize),resizable: false, border: ~guiBorder)
+	.autoRememberPosition(\bitrot, prefix.asSymbol);
 	if(frontWindow){
 		win.front
 	};
-	win.view.background_(Color.black);
+	win.view.background_(~guiBackgroundColor);
 	win.drawFunc = {
 		var cols = sharedEv.caSize, rows = sharedEv.lastValuesSize;
 		cols.do{ |col|
@@ -47,6 +48,16 @@
 	};
 
 	game = (
+		setOfVisible: Set.new(),
+		windowOnOff: { |onOff, sym|
+			if(onOff){
+				game.setOfVisible.add(sym);
+				{win.visible_(true)}.defer
+			}{
+				game.setOfVisible.remove(sym);
+				if(game.setOfVisible.isEmpty){{win.visible_(false)}.defer}
+			}
+		},
 		pointerToWindow: win,
 		sharedEv: sharedEv,
 		lastValues: (0 ! initCaSize) ! initLastValuesSize,
@@ -149,14 +160,18 @@
 		currentRule: game[\makeRules],
 		caRange: game[\onlyShow],
 		tdefOnOff: {|onOff|
+			game[\windowOnOff].(onOff.asBoolean, prefix.asSymbol);
 			if(onOff.asBoolean){
 				Tdef(\bitflip).play(quant: 1);
-				{win.visible_(true)}.defer
+				~game1.sharedEv.linkBitFlip = 0;
+				~game2.sharedEv.linkBitFlip = 0;
 			}{
 				Tdef(\bitflip).stop;
-				{win.visible_(false)}.defer
-			};
-			//sharedEv.tdefOnOff = onOff;
+			}
+		},
+		sendRate: {
+			Tdef(\bitflip).quant_(1);
+			Tdef(\bitflip, game[\tdefLoopFunc]);
 		}
 	));
 	sharedEv.sendAll;
@@ -177,47 +192,49 @@
 
 	game.presetManager = ~makePresetManager.(prefix, ["~gameBitFlip.sharedEv"]);
 
+	game.tdefLoopFunc = {
+		var lastColSums = 0 ! game.sharedEv.caSize;
+		var nextColSums;
+		var bitDummy = 0!10;
+		var sendArray;
+		var calcBitFlips = {
+			var res = bitDummy.copy;
+			game.colSums[game.relevantCa[0]..(game.relevantCa[1] - 1)].do {|v, ix|
+				res[ix + game.delayedCaRange[0]] = v
+			};
+			res
+		};
+		loop {
+			var blendSteps = game.sharedEv.blendSteps;
+			var sendRate = game.sharedEv.sendRate; // Hz
+			if(blendSteps > 1){
+				var waitTime = (sendRate * blendSteps).reciprocal;
+				game.nextGen(false);
+				nextColSums = game.colSums;
+				blendSteps.do { |step|
+					var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
+					game.colSums = blendedColSums.round(1).asInteger;
+					game.visualize;
+					sendArray = calcBitFlips.();
+					~toBenni.sendMsg("/bitrotData", *(["xorBits"] ++ sendArray));
+					waitTime.wait;
+				};
+				lastColSums = nextColSums;
+			}{
+				game.nextGen(false);
+				game.colSums = game.colSums.round(1).asInteger;
+				game.visualize;
+				sendArray = calcBitFlips.();
+				~toBenni.sendMsg("/bitrotData", *(["xorBits"] ++ sendArray));
+				sendRate.reciprocal.wait;
+			}
+		}
+	};
+	Tdef(\bitflip, game[\tdefLoopFunc]);
+
 	game
 };
 
-Tdef(\bitflip, {
-	var lastColSums = 0 ! ~gameBitFlip.sharedEv.caSize;
-	var nextColSums;
-	var bitDummy = 0!10;
-	var sendArray;
-	var calcBitFlips = {
-		var res = bitDummy.copy;
-		~gameBitFlip.colSums[~gameBitFlip.relevantCa[0]..(~gameBitFlip.relevantCa[1] - 1)].do {|v, ix|
-			res[ix + ~gameBitFlip.delayedCaRange[0]] = v
-		};
-		res
-	};
-	loop {
-		var blendSteps = ~gameBitFlip.sharedEv.blendSteps;
-		var sendRate = ~gameBitFlip.sharedEv.sendRate; // Hz
-		if(blendSteps > 1){
-			var waitTime = (sendRate * blendSteps).reciprocal;
-			~gameBitFlip.nextGen(false);
-			nextColSums = ~gameBitFlip.colSums;
-			blendSteps.do { |step|
-				var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
-				~gameBitFlip.colSums = blendedColSums.round(1).asInteger;
-				~gameBitFlip.visualize;
-				sendArray = calcBitFlips.();
-				~toBenni.sendMsg("/bitrotData", *(["xorBits"] ++ sendArray));
-				waitTime.wait;
-			};
-			lastColSums = nextColSums;
-		}{
-			~gameBitFlip.nextGen(false);
-			~gameBitFlip.colSums = ~gameBitFlip.colSums.round(1).asInteger;
-			~gameBitFlip.visualize;
-			sendArray = calcBitFlips.();
-			~toBenni.sendMsg("/bitrotData", *(["xorBits"] ++ sendArray));
-			sendRate.reciprocal.wait;
-		}
-	}
-});
 
 Pdefn(\bitflipNext, Routine {
 	var lastColSums = 0 ! ~gameBitFlip.sharedEv.caSize;

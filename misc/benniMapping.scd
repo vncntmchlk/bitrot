@@ -33,34 +33,71 @@ n.sendMsg("/bitrotData", "freeze", 0) //0 1
 n.sendMsg("/notes0", 72, 100) // notes0 instrument1
 n.sendMsg("/notes0", 72, 0) // notes0 instrument1 noteOff veloc 0 -- wichtig ..
 
-// alle parameter gleichzeitig aendern
-Pbind(
-	\midinote, Pswitch1([
-		Pstep([60,61,62,63],[1,1,1,1] * 1.5,inf),
-		Pn(72)
-	],Pseq([Pn(0,11),1],inf)).trace,
-	\dur, Pwrand([1/8,1,3],[0.7,0.2,0.1],inf),
-	\rest, Rest(1),
-	\fftXbins, Pfunc{[16, 32, 64, 128, 256].scramble},
-	\fftBinsGain, Pfunc{ 6.collect{ 22.0.rand} },
-	\fftBinsDenoise, Pfunc{ 6.collect{ 52.0.rand * -1} },
-	\grainStart_Looplength_Scanspeed, Pfunc { [500 + 3000.rand, 50.rand, 100.rand] },
-	\freezeGrains, Pfunc { 2.rand },
-	\xorBits, Pfunc{[1,1,0,0,0,0,0,0,0,0].scramble},
-	\groupSRR, Pwhite(0,1),
-	\groupTrunc,Pseq([0,0.5,1],inf),// Pn(Pgeom(0.1, 1.1, 20)),
-	\finish, { |ev|
-		n.sendMsg("/notes0",*[ev.midinote, 50 + 30.rand]);
-		n.sendMsg("/bitrotData", "fftXbins", *ev.fftXbins);
-		n.sendMsg("/bitrotData", "fftBinsGain", *ev.fftBinsGain);
-		n.sendMsg("/bitrotData", "fftBinsDenoise", *ev.fftBinsDenoise);
-		n.sendMsg("/bitrotData", "grainStart_Looplength_Scanspeed", *ev.grainStart_Looplength_Scanspeed);
-		n.sendMsg("/bitrotData", "freeze", ev.freezeGrains);
-		n.sendMsg("/bitrotData", "xorBits", *ev.xorBits);
-		n.sendMsg("/bitrotData", "groupSRR", ev.groupSRR);
-		n.sendMsg("/bitrotData", "groupTrunc", ev.groupTrunc.clip(0, 1))
+
+// buzzer on und off.
+// werte auf standard zurueck und bass anmachen
+// werte auf standard zurueck und magic preset anmachen
+
+~buzzerStuff = (
+	sharedEv: OSCSharedEvent.new(~localHost, "buzzer"),
+	resetValues: {
+		topEnvironment[\toBenni].sendMsg("/clips", 0);
+		topEnvironment[\toBenni].sendMsg("/bitrotData", "fftXbins", *[16, 32, 64, 128, 256]);
+		topEnvironment[\toBenni].sendMsg("/bitrotData", "fftBinsGain", *[0, 0, 0, 0, 0, 0]);
+		topEnvironment[\toBenni].sendMsg("/bitrotData", "xorBits", *[0,0,0,0,0,0,0,0,0,0]);
+		topEnvironment[\toBenni].sendMsg("/bitrotData", "groupSRR", 1);
+		topEnvironment[\toBenni].sendMsg("/bitrotData", "groupTrunc", 1)
+	},
+	nukeOnOff: 0,
+	startNuke: { |self|
+		self.nukeOnOff = 1;
+		self.nukePbind = Pbind(
+			\midinote, Pswitch1([
+				Pstep([60,61,62,63],[1,1,1,1] * 1.5,inf),
+				Pn(72)
+			],Pseq([Pn(0,11),1],inf)).trace,
+			\dur, Pwrand([1/8,1,3],[0.7,0.2,0.1],inf) * self.durMod,
+			\rest, Rest(1),
+			\fftXbins, Pfunc{[16, 32, 64, 128, 256].scramble},
+			\fftBinsGain, Pfunc{ 6.collect{ 22.0.rand} },
+			\fftBinsDenoise, Pfunc{ 6.collect{ 52.0.rand * -1} },
+			\grainStart_Looplength_Scanspeed, Pfunc { [500 + 3000.rand, 50.rand, 100.rand] },
+			\freezeGrains, Pfunc { 2.rand },
+			\xorBits, Pfunc{[1,1,0,0,0,0,0,0,0,0].scramble},
+			\groupSRR, Pwhite(0,1),
+			\groupTrunc,Pseq([0,0.5,1],inf),// Pn(Pgeom(0.1, 1.1, 20)),
+			\finish, { |ev|
+				topEnvironment[\toBenni].sendMsg("/clips", 10.rand);
+				topEnvironment[\toBenni].sendMsg("/bitrotData", "fftXbins", *ev.fftXbins);
+				topEnvironment[\toBenni].sendMsg("/bitrotData", "fftBinsGain", *ev.fftBinsGain);
+				topEnvironment[\toBenni].sendMsg("/bitrotData", "xorBits", *ev.xorBits);
+				topEnvironment[\toBenni].sendMsg("/bitrotData", "groupSRR", ev.groupSRR);
+				topEnvironment[\toBenni].sendMsg("/bitrotData", "groupTrunc", ev.groupTrunc.clip(0, 1))
+			}
+		).play(quant: 0);
+	},
+	stopNuke: { |self|
+		self.nukeOnOff = 0;
+		self.nukePbind.stop;
+	},
+	stopNukeAndBass: { |self|
+		self.nukeOnOff = 0;
+		self.nukePbind.stop;
 	}
-).play
+);
+
+~buzzerStuff.sharedEv.durMod = 1;
+~buzzerStuff.sharedEv.nukePush = 0;
+
+~buzzerStuff.sharedEv.makeOSCdefsForKeys((
+	nukePush: {|val|
+		if(~buzzerStuff.nukeOnOff.asBoolean){
+			~buzzerStuff.stopNuke
+		}{
+			~buzzerStuff.startNuke
+		}
+	}
+))
 
 
 

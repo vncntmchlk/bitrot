@@ -20,12 +20,12 @@ p = [
 		'waitDur',  4.0,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
 		'muteEveryX',  0,  'onOff',  1,  
-		'circleLegato',  0.125,  nil,  nil,  
+		'circleLegato',  0.059999998658895,  nil,  nil,  
 		'loopSpeedLevel',  1.0,  nil,  nil ],  
 	// Dictionary
 	4, [ array: o[5],  size: 6 ],  
 	// Array
-	5, [ 'noteArrayLen',  8,  'monoMode',  1,  
+	5, [ 'noteArrayLen',  8,  'monoMode',  0,  
 		'linkToRhy1Mute',  0,  nil,  nil,  
 		nil,  nil,  'freezeMe',  0,  
 		nil,  nil,  'onOff',  1,  
@@ -35,10 +35,10 @@ p = [
 	6, [ array: o[7],  size: 6 ],  
 	// Array
 	7, [ nil,  nil,  nil,  nil,  
-		'waitDur',  8,  'fade',  0,  
+		'waitDur',  8.0,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
 		'muteEveryX',  0,  'onOff',  1,  
-		'circleLegato',  0.28999999165535,  nil,  nil,  
+		'circleLegato',  0.47999998927116,  nil,  nil,  
 		'loopSpeedLevel',  1,  nil,  nil ]
 ];
 prUnarchive(o,p);

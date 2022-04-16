@@ -65,7 +65,7 @@ center_coordinates = (int(width * 0.5), int(height * 0.5))
 # circle parameters
 #radius = 150
 color = (1, 1, 1)
-thickness = 2 # px
+thickness = 5 # px
     
 # circle
 circle = cv2.circle(blank_image, center_coordinates, 60, color, thickness)
@@ -100,7 +100,7 @@ def apply_thresh(img):
     return im_bw
 
 camera = PiCamera()
-fps = 20
+fps = 10
 camera.framerate = fps
 camera.resolution = (resX, resY)
 rawCapture = PiRGBArray(camera, size=(resX, resY))
