@@ -1,8 +1,7 @@
 ~circles.guiElements.resolution = [ 270, 392 ];
 ~circles.guiElements.fps = 25;
 ~circles.guiElements.res2 = ~circles.guiElements.resolution * 2;
-~circles.guiElements.noteMapping = (0, 12 .. 120).collect (_ + Scale.major.degrees).flat;
-
+// ~circles.guiElements.noteMapping = (0, 12 .. 120).collect (_ + Scale.major.degrees).flat;
 
 ["melodie", "bass", "melodie2"].do { |name|
 	var symWindow = (name ++ "Window").asSymbol;
@@ -71,8 +70,6 @@
 				}{
 					Color.grey(1,0.75)
 				};
-				// set the Color
-
 				drawWedge.(startAng, sweep, (midinn - noteLines - midinoteLineOffset) % noteLines, hitColor)
 				// (midinn - noteLines) % noteLines -> 60 ist in der mitte
 				// (midinn - noteLines - 12) % noteLines -> 60 ist unten
@@ -80,20 +77,6 @@
 		};
 	};
 };
-
-/*{
-var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_g_clef";
-~circles.guiElements.noteImgsGClef = (0..127).collect {|nn|
-Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
-};
-}.value;
-
-{
-var imgPath = PathName(thisProcess.nowExecutingPath).pathOnly +/+ "svg_f_clef";
-~circles.guiElements.noteImgsFClef = (0..127).collect {|nn|
-Image.openSVG(imgPath +/+ nn ++ ".cropped.svg")
-};
-}.value;*/
 
 [~circles.melodieCircle, ~circles.bassCircle, ~circles.melodie2Circle].do {|instrumentCircle|
 	instrumentCircle.view.drawFunc = {

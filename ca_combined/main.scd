@@ -9,16 +9,11 @@
 
 //gaba preset: 10th und accelerando zu tempo clock 2.5, schnelle melodie kommt spaeter dazu
 
-// durchzappen, zb die sample 1 mit fft beats dings zu den magic dings hin und her duch kombinierte presets
+// cues ausmisten, fuer die rhythmen gute einstellungen finden. jedesmal wenn ein instrument oder fx dazukommt einen cue dafuer haben
+
 
 ~toBenni = NetAddr("192.168.1.101", 7401); // PORT
 
-// bei 22 clicks und clips aus, melodie 1 auch
-// die links duerfen nicht gegenseitig die windows ausschalten, brauch ein globas set oder so
-
-// block or pass quantisiert aendern bei den fft loechern
-// topEnvironment[\toBenni].sendMsg("/bitrotData", "fftXbins", *[16, 32, 64, 128, 256]);
-bei 22 ein kombinierten cue der alles umschaltet
 (
 ~guiBorder = true;
 ~guiBackgroundColor = Color.grey(0, 0); // Color.grey(0, 0);
@@ -48,7 +43,7 @@ thisProcess.openUDPPort(9005); // from philipp
 "resources_circle.scd".loadRelative;
 "gui_windows_circle.scd".loadRelative;
 "cuePlan_to_gui.scd".loadRelative;
-// ~rpiAddr.sendMsg("/circles", 1);
+
 ~tempoSharedEv = OSCSharedEvent.new(~localhost);
 ~tempoSharedEv.tempo = 1;
 ~tempoSharedEv.makeOSCdefsForKeys((
@@ -56,37 +51,28 @@ thisProcess.openUDPPort(9005); // from philipp
 		TempoClock.default.tempo = val;
 	}
 ));
-~buzzerStuff.resetValues
+~buzzerStuff.resetValues;
+~rpiAddr.sendMsg("/circles", 1);
 )
 
-
-// USW
 ~rpiAddr.sendMsg("/circles", 0);
 ~rpiAddr.sendMsg("/circles", 1);
 
-~toBenni.sendMsg("/clips", 0)
-~toBenni.sendMsg("/clips", 1)
-~toBenni.sendMsg("/clips", 3)
-~toBenni.sendMsg("/cue", 3)
 
 TempoClock.default.tempo = 1;
 
-// wie kann man hier chan sinnvoll reinbringen?
-// waere auch gut wenn es zb Pseq([11, 12],inf) moeglich waere
-
-~circles.melodieCircle.presetManager[\savePreset].("accelZusammen")
+~circles.melodieCircle.presetManager[\savePreset].("C16_homophon")
 ~circles.melodie2Circle.presetManager[\savePreset].("accelZusammen")
 ~circles.bassCircle.presetManager[\loadPreset].("benniSolo")
 
 
-~circles.melodieCircle.presetManager[\savePreset].("kuckkucksNest")
+~circles.melodieCircle.presetManager[\savePreset].("C34_M1_M2_sync")
 ~circles.melodieCircle.presetManager[\showPresetDifference].("suesseMelodie2")
-// ~circles.chordsCircle.presetManager[\savePreset].("basicOFF")
-~circles.melodie2Circle.presetManager[\savePreset].("magic_arp")
+~circles.melodie2Circle.presetManager[\savePreset].("C34_M1_M2_sync")
 ~circles.bassCircle.presetManager[\savePreset].("benniSolo")
-~gameFFT.presetManager[\savePreset].("shredding")
-~gameBitFlip.presetManager[\savePreset].("shredRegular")
-~rhythmPM[\savePreset].("shredding")
+~gameFFT.presetManager[\savePreset].("C29_waves")
+~gameBitFlip.presetManager[\savePreset].("C38_softRule6")
+~rhythmPM[\savePreset].("C28_q10Clicks")
 
 ~circles.melodieCircle.presetManager[\savePreset].("cue8_prep")
 

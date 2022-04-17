@@ -20,6 +20,7 @@
 		if(onOff.asBoolean){
 			~gameFFT.seedMe;
 			~gameFFT.sharedEv.tdefOnOff = 0;
+			~clipSequencer.sharedEv.linkFFTCa = 0;
 			//{~gameFFT.pointerToWindow.visible_(true)}.fork(AppClock);
 			ev.linkFunc = Pfunc{|ev| if(ev.amp > 0){Pdefn(\caFFTNext).asStream.next};0};
 		}{
@@ -132,7 +133,7 @@
 	ev.gameBlockSize = 40;
 	ev.gameBlockRow = 40 / 1.61803398875;
 	ev.gameBlockCol = 40;
-	ev.win = Window.new(prefix, bounds:(ev.maxSize * ev.gameBlockCol)@(ev.maxSize * ev.gameBlockRow), border: ~guiBorder)
+	ev.win = Window.new(prefix, bounds: Rect(0,0,(ev.maxSize * ev.gameBlockCol),(ev.maxSize * ev.gameBlockRow)), border: ~guiBorder)
 	.background_(~guiBackgroundColor)
 	.autoRememberPosition(\bitrot, prefix.asSymbol);
 	if(frontWindow){

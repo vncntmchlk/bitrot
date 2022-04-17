@@ -235,7 +235,6 @@
 	game
 };
 
-
 Pdefn(\bitflipNext, Routine {
 	var lastColSums = 0 ! ~gameBitFlip.sharedEv.caSize;
 	var nextColSums;
@@ -256,97 +255,3 @@ Pdefn(\bitflipNext, Routine {
 		1.yield;
 	}
 });
-
-/*Tdef(\fftBinsGainSmooth, {
-var lastColSums = 0 ! ~gameBitFlip.sharedEv.caSize;
-var nextColSums;
-var sendDb;
-var dbArr = [
-[-15, 12],
-[-9, 21],
-[-21, 21],
-[-27, 21],
-[-36, 21],
-[-9, 36]
-];
-var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
-loop {
-var blendSteps = ~gameBitFlip.sharedEv.blendSteps;
-var sendRate = ~gameBitFlip.sharedEv.sendRate; // Hz
-if(~gameBitFlip.sharedEv.blendSteps > 1){
-var waitTime = (~gameBitFlip.sharedEv.sendRate * blendSteps).reciprocal;
-~gameBitFlip.nextGen(false);
-nextColSums = ~gameBitFlip.colSums;
-blendSteps.do { |step|
-var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
-~gameBitFlip.colSums = blendedColSums;
-~gameBitFlip.visualize; //~game.visualize(false);
-sendDb = ~gameBitFlip.colSums[~gameBitFlip.relevantCa[0]..(~gameBitFlip.relevantCa[1] - 1)].collect {|v, ix|
-v = emphasizeMidSection[v];
-v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
-};
-// sendDb = ~gameBitFlip.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
-~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
-waitTime.wait;
-};
-lastColSums = nextColSums;
-}{
-~gameBitFlip.nextGen;
-sendDb = ~gameBitFlip.colSums[~gameBitFlip.relevantCa[0]..(~gameBitFlip.relevantCa[1] - 1)].collect {|v, ix|
-v = emphasizeMidSection[v];
-v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
-};
-// sendDb = ~gameBitFlip.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
-~toBenni.sendMsg("/bitrotData", "fftBinsGain", *sendDb);
-sendRate.reciprocal.wait;
-}
-}
-})*/
-
-/* hier bins MIN, variablen muessen noch umbenannt werden
-Tdef(\fftBinsMin, {
-var lastColSums = 0 ! ~gameBitFlip.sharedEv.caSize;
-var nextColSums;
-var sendDb;
-var dbArr = [
-[0, 6],
-[0, 5],
-[0, 4],
-[0, 3],
-[0, 2],
-[0, 1]
-];
-var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[5, -5]);
-loop {
-var blendSteps = ~gameBitFlip.sharedEv.blendSteps;
-var sendRate = ~gameBitFlip.sharedEv.sendRate; // Hz
-if(~gameBitFlip.sharedEv.blendSteps > 1){
-var waitTime = (~gameBitFlip.sharedEv.sendRate * blendSteps).reciprocal;
-~gameBitFlip.nextGen(false);
-nextColSums = ~gameBitFlip.colSums;
-blendSteps.do { |step|
-var blendedColSums = lastColSums.blend(nextColSums, step / blendSteps);
-~gameBitFlip.colSums = blendedColSums;
-~gameBitFlip.visualize; //~game.visualize(false);
-sendDb = ~gameBitFlip.colSums[~gameBitFlip.relevantCa[0]..(~gameBitFlip.relevantCa[1] - 1)].collect {|v, ix|
-v = emphasizeMidSection[v];
-v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
-};
-// sendDb = ~gameBitFlip.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
-~toBenni.sendMsg("/bitrotData", "fftBinsMin", *sendDb);
-waitTime.wait;
-};
-lastColSums = nextColSums;
-}{
-~gameBitFlip.nextGen;
-sendDb = ~gameBitFlip.colSums[~gameBitFlip.relevantCa[0]..(~gameBitFlip.relevantCa[1] - 1)].collect {|v, ix|
-v = emphasizeMidSection[v];
-v.linlin(0, 1, dbArr[ix][0], dbArr[ix][1])
-};
-// sendDb = ~gameBitFlip.colSums[3..8].collect {|v, ix| v.lincurve(0, 1, dbArr[ix][0], dbArr[ix][1], -4)};
-~toBenni.sendMsg("/bitrotData", "fftBinsMin", *sendDb);
-sendRate.reciprocal.wait;
-}
-}
-})
-*/

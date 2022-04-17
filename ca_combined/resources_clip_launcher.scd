@@ -54,7 +54,6 @@ var prefix =  "clipSeq";
 	}
 );
 
-
 ~clipSequencer.sharedEv.makeOSCdefsForKeys((
 	tdefOnOff: {|onOff|
 		if(onOff.asBoolean){
