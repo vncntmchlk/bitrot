@@ -75,13 +75,30 @@ var prefix =  "clipSeq";
 			switch(~clipSequencer.sharedEv.stopMode.asInteger)
 			{0}{~buzzerStuff.stopNuke}
 			{1}{~buzzerStuff.stopNukeAndReset}
-			{2}{~buzzerStuff.stopNukeAndReset}
-			{~buzzerStuff.stopNukeAndReset}
+			{2}{
+				~buzzerStuff.stopNukeAndReset;
+				~toBenni.sendMsg("/clips", 2);
+			}
+			{3}{ // random Clip
+				~buzzerStuff.stopNukeAndReset;
+				~toBenni.sendMsg("/clips", (1+(13.rand)));
+			}
+			{4}{ // ubahn
+				~buzzerStuff.stopNukeAndReset;
+				~toBenni.sendMsg("/clips", 7);
+			}
+
 		}{
 			~buzzerStuff.startNuke
 		}
 	}
 ));
+
+/*{
+"ubahn": 1,
+"all off": 0,
+"bass solo": 2
+}*/
 
 ~clipSequencer.sharedEv.sendAll;
 

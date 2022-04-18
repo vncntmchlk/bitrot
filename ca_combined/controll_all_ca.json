@@ -647,10 +647,10 @@
             "align": "center",
             "values": {
               "shredding": "shredding",
+              "C32_waves": "C32_waves",
               "soft_high": "soft_high",
-              "C35_holes": "C35_holes",
+              "C38_holes": "C38_holes",
               "quantizingGrains": "quantizingGrains",
-              "C29_waves": "C29_waves",
               "C3_loopCuts": "C3_loopCuts",
               "basicOFF": "basicOFF"
             },
@@ -1186,7 +1186,8 @@
               "6": 6,
               "30": 30,
               "86": 86,
-              "121": 121
+              "121": 121,
+              "122": 122
             },
             "mode": "tap",
             "value": "",
@@ -1714,8 +1715,7 @@
             "values": {
               "fastHi": "fastHi",
               "shredRegular": "shredRegular",
-              "kuckkucksNest": "kuckkucksNest",
-              "C38_softRule6": "C38_softRule6",
+              "C41_softRule6": "C41_softRule6",
               "C20_softSlow": "C20_softSlow",
               "basicOFF": "basicOFF"
             },
@@ -3141,13 +3141,12 @@
             "icon": "true",
             "align": "center",
             "values": {
-              "10th": "10th",
               "bitflip_linked_zerfressen": "bitflip_linked_zerfressen",
-              "C28_q10Clicks": "C28_q10Clicks",
               "16th": "16th",
               "C3_firstClicks": "C3_firstClicks",
               "quantizingGrains": "quantizingGrains",
-              "cue8_long_slow": "cue8_long_slow",
+              "C31_q10Clicks": "C31_q10Clicks",
+              "GABA_10th": "GABA_10th",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -4838,20 +4837,13 @@
             "icon": "true",
             "align": "center",
             "values": {
-              "suesseMelodie2": "suesseMelodie2",
-              "cue11_erinnerung": "cue11_erinnerung",
-              "C33_telephon": "C33_telephon",
               "C13_simple": "C13_simple",
-              "C34_M1_M2_sync": "C34_M1_M2_sync",
-              "gabaFull": "gabaFull",
-              "simpleMath": "simpleMath",
-              "accelZusammen": "accelZusammen",
-              "basicOFF": "basicOFF",
               "C16_homophon": "C16_homophon",
-              "suesseMelodie3": "suesseMelodie3",
+              "gabaFull": "gabaFull",
+              "C37_M1_M2_sync": "C37_M1_M2_sync",
               "suesseMelodie": "suesseMelodie",
-              "kuckkucksNest": "kuckkucksNest",
-              "simpleArp": "simpleArp"
+              "C36_telephon": "C36_telephon",
+              "basicOFF": "basicOFF"
             },
             "value": "",
             "default": "",
@@ -6023,7 +6015,6 @@
               "C6_bassEntwicklung": "C6_bassEntwicklung",
               "benniSolo": "benniSolo",
               "legatoSpiel": "legatoSpiel",
-              "kuckkucksNest": "kuckkucksNest",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -7327,7 +7318,6 @@
             "values": {
               "magic_arp": "magic_arp",
               "C34_M1_M2_sync": "C34_M1_M2_sync",
-              "accelZusammen": "accelZusammen",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -7855,8 +7845,8 @@
           },
           {
             "type": "button",
-            "top": 430,
-            "left": 660,
+            "top": 440,
+            "left": 520,
             "lock": false,
             "id": "@{parent.id}/nukePush",
             "visible": true,
@@ -8014,7 +8004,9 @@
             "wrap": false,
             "values": {
               "1": 1,
-              "0.25": 0.25
+              "3": 3,
+              "0.25": 0.25,
+              "0.05": 0.05
             },
             "mode": "tap",
             "value": "",
@@ -8040,7 +8032,7 @@
             "interaction": true,
             "comments": "",
             "width": "auto",
-            "height": 120,
+            "height": 280,
             "expand": "false",
             "colorText": "auto",
             "colorWidget": "auto",
@@ -8058,9 +8050,11 @@
             "gridTemplate": "",
             "wrap": false,
             "values": {
-              "2": 2,
+              "glocken": 2,
               "all off": 0,
-              "bass solo": 1
+              "off and reset": 1,
+              "random Clip": 3,
+              "ubahn": 4
             },
             "mode": "tap",
             "value": "",
@@ -8175,20 +8169,13 @@
             "html": "",
             "css": "",
             "values": {
-              "suesseMelodie2": "suesseMelodie2",
-              "cue11_erinnerung": "cue11_erinnerung",
-              "C33_telephon": "C33_telephon",
               "C13_simple": "C13_simple",
-              "C34_M1_M2_sync": "C34_M1_M2_sync",
-              "gabaFull": "gabaFull",
-              "simpleMath": "simpleMath",
-              "accelZusammen": "accelZusammen",
-              "basicOFF": "basicOFF",
               "C16_homophon": "C16_homophon",
-              "suesseMelodie3": "suesseMelodie3",
+              "gabaFull": "gabaFull",
+              "C37_M1_M2_sync": "C37_M1_M2_sync",
               "suesseMelodie": "suesseMelodie",
-              "kuckkucksNest": "kuckkucksNest",
-              "simpleArp": "simpleArp"
+              "C36_telephon": "C36_telephon",
+              "basicOFF": "basicOFF"
             },
             "value": "",
             "default": "",
@@ -8303,10 +8290,10 @@
             "css": "",
             "values": {
               "shredding": "shredding",
+              "C32_waves": "C32_waves",
               "soft_high": "soft_high",
-              "C35_holes": "C35_holes",
+              "C38_holes": "C38_holes",
               "quantizingGrains": "quantizingGrains",
-              "C29_waves": "C29_waves",
               "C3_loopCuts": "C3_loopCuts",
               "basicOFF": "basicOFF"
             },
@@ -8330,8 +8317,8 @@
           },
           {
             "type": "switch",
-            "top": 500,
-            "left": 830,
+            "top": 520,
+            "left": 680,
             "lock": false,
             "id": "gui/loadPreset",
             "visible": true,
@@ -8400,8 +8387,7 @@
             "values": {
               "fastHi": "fastHi",
               "shredRegular": "shredRegular",
-              "kuckkucksNest": "kuckkucksNest",
-              "C38_softRule6": "C38_softRule6",
+              "C41_softRule6": "C41_softRule6",
               "C20_softSlow": "C20_softSlow",
               "basicOFF": "basicOFF"
             },
@@ -8482,13 +8468,12 @@
             "html": "",
             "css": "",
             "values": {
-              "10th": "10th",
               "bitflip_linked_zerfressen": "bitflip_linked_zerfressen",
-              "C28_q10Clicks": "C28_q10Clicks",
               "16th": "16th",
               "C3_firstClicks": "C3_firstClicks",
               "quantizingGrains": "quantizingGrains",
-              "cue8_long_slow": "cue8_long_slow",
+              "C31_q10Clicks": "C31_q10Clicks",
+              "GABA_10th": "GABA_10th",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -8606,7 +8591,6 @@
               "C6_bassEntwicklung": "C6_bassEntwicklung",
               "benniSolo": "benniSolo",
               "legatoSpiel": "legatoSpiel",
-              "kuckkucksNest": "kuckkucksNest",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -8688,7 +8672,6 @@
             "values": {
               "magic_arp": "magic_arp",
               "C34_M1_M2_sync": "C34_M1_M2_sync",
-              "accelZusammen": "accelZusammen",
               "basicOFF": "basicOFF"
             },
             "value": "",
@@ -8834,15 +8817,15 @@
           },
           {
             "type": "fader",
-            "top": 280,
-            "left": 700,
+            "top": 30,
+            "left": 960,
             "lock": false,
             "id": "tempo",
             "visible": true,
             "interaction": true,
             "comments": "",
             "width": "auto",
-            "height": 340,
+            "height": 540,
             "expand": "false",
             "colorText": "auto",
             "colorWidget": "auto",
@@ -8888,8 +8871,8 @@
           },
           {
             "type": "input",
-            "top": 630,
-            "left": 680,
+            "top": 570,
+            "left": 940,
             "lock": false,
             "id": "tempo",
             "visible": true,

@@ -35,10 +35,10 @@ p = [
 	6, [ array: o[7],  size: 6 ],  
 	// Array
 	7, [ nil,  nil,  nil,  nil,  
-		'waitDur',  8.0,  'fade',  0,  
+		'waitDur',  8,  'fade',  0,  
 		nil,  nil,  nil,  nil,  
 		'muteEveryX',  0,  'onOff',  1,  
 		'circleLegato',  0.5,  nil,  nil,  
-		'loopSpeedLevel',  1.0,  nil,  nil ]
+		'loopSpeedLevel',  1,  nil,  nil ]
 ];
 prUnarchive(o,p);

@@ -13,7 +13,9 @@
 
 
 ~toBenni = NetAddr("192.168.1.101", 7401); // PORT
-
+// bei 21 clicks hoerbar????
+// bei gaba bass auf 10er vorher
+// anfang ueben und fft tiefe einbauen
 (
 ~guiBorder = true;
 ~guiBackgroundColor = Color.grey(0, 0); // Color.grey(0, 0);
@@ -52,7 +54,7 @@ thisProcess.openUDPPort(9005); // from philipp
 	}
 ));
 ~buzzerStuff.resetValues;
-~rpiAddr.sendMsg("/circles", 1);
+// ~rpiAddr.sendMsg("/circles", 1);
 )
 
 ~rpiAddr.sendMsg("/circles", 0);
