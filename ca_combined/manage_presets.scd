@@ -117,7 +117,9 @@ var presetFolderPath = PathName(thisProcess.nowExecutingPath).pathOnly  ++ "pres
 			fft: ~gameFFT.pointerToWindow,
 			bitflip: ~gameBitFlip.pointerToWindow,
 			rhy1: ~game1.win,
-			rhy2: ~game2.win
+			rhy2: ~game2.win,
+			spectogramBig: ~spectograms.big.win,
+			spectogramSmall: ~spectograms.small.win,
 		),
 		getPositions: {|self|
 			self.positions = self.windows.collect { |w| w.bounds.origin }
@@ -128,16 +130,15 @@ var presetFolderPath = PathName(thisProcess.nowExecutingPath).pathOnly  ++ "pres
 			};
 		}
 	);
-
 	pm.getPositions;
 
 	OSCdef((pmName ++ "loadPreset").asSymbol, {|msg|
-		pm[\loadPreset].(msg[1]);
+		{pm[\loadPreset].(msg[1])}.defer;
 	}, "/" ++ pmName +/+ "loadPreset").fix;
 
 	OSCdef((pmName ++ "updatePreset").asSymbol, {|msg|
 		("updating " ++ msg[1]).postln;
-		pm[\savePreset].(msg[1]);
+		{pm[\savePreset].(msg[1])}.defer;
 	}, "/" ++ pmName +/+ "updatePreset").fix;
 
 	pm.sendPresetsToOSC;

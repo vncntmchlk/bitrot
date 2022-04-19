@@ -1,21 +1,24 @@
-// preset speichern:
-// alle aktuellen positionen, sowie scope einstellungen und evtl noch andere wie CA size werden gespeichert
-// preset name wird zu osc geschickt
-
-// preset laden:
-// alle ... werden geladen
-
+var prefix = "gui";
 ~guiAll = ();
-~guiAll.pm = ~makePresetManagerGUI.("gui",["~guiAll.pm.positions","~scopeGUI.options"]);
+~guiAll.sharedEv = OSCSharedEvent.new(~localHost, prefix);
+~guiAll.sharedEv.scopeOnOff = 0;
+~guiAll.sharedEv.specBigOnOff = 0;
+~guiAll.sharedEv.specSmallOnOff = 0;
+~guiAll.sharedEv.makeOSCdefsForKeys((
+	scopeOnOff: (~scopeGUI[\onOff].(_)),
+	specBigOnOff: (~spectograms.big[\onOff].(_)),
+	specSmallOnOff: (~spectograms.small[\onOff].(_))
+));
+~guiAll.sharedEv.sendAll;
+~guiAll.pm = ~makePresetManagerGUI.(prefix,
+	["~guiAll.pm.positions","~scopeGUI.options","~guiAll.sharedEv"]
+);
 
 
-~guiAll.pm[\savePreset].("useless2");
 
-
-~scopeGUI.win.visible_(true)
 
 //change these while the program is running
-~scopeGUI.options.sample= 2;
+/*~scopeGUI.options.sample= 2;
 ~scopeGUI.options.sample= 10;
 ~scopeGUI.options.sample= 1;
 ~scopeGUI.options.trails= 1
@@ -39,7 +42,4 @@
 ~scopeGUI.options.speed = 0.1;
 ~scopeGUI.options.sample = 2;
 ~scopeGUI.options.amp = 1;
-~scopeGUI.options.version = 2;
-a = Spectrogram.new;
-a.start;
-{SoundIn.ar([4, 5])}.play
+~scopeGUI.options.version = 2;*/
