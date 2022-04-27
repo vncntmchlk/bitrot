@@ -17,9 +17,9 @@ p = [
 		'sendRate',  1.0,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		'blendSteps',  10,  'caSize',  16,  
-		'fftDepth',  1.0,  'caRange',  o[4],  
+		'fftDepth',  1,  'caRange',  o[4],  
 		'lastValuesSize',  2,  nil,  nil,  
-		'tdefOnOff',  1.0,  'blockOrPass',  0,  
+		'tdefOnOff',  1.0,  'blockOrPass',  1.0,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil ],  
 	// Array

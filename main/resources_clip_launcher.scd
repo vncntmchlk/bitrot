@@ -6,9 +6,11 @@ var prefix =  "clipSeq";
 ~clipSequencer.sharedEv.linkFFTCa = 0;
 ~clipSequencer.sharedEv.tdefOnOff = 0;
 
+~clipSequencer.presetManager = ~makePresetManager.(prefix,["~clipSequencer.sharedEv"]);
+
 // Buzzer stuff
 ~clipSequencer.sharedEv.durMod = 1;
-~clipSequencer.sharedEv.nukePush = 0;
+
 ~clipSequencer.sharedEv.stopMode = 0;
 ~buzzerStuff = (
 	resetValues: {
@@ -23,7 +25,7 @@ var prefix =  "clipSeq";
 	startNuke: { |self|
 		self.nukeOnOff = 1;
 		self.nukePbind = Pbind(
-			\dur, Pwrand([1/8,1,3],[0.7,0.2,0.1],inf).trace * Pfunc {~clipSequencer.sharedEv.durMod},
+			\dur, Pwrand([1/8,1,3],[0.7,0.2,0.1],inf) * Pfunc {~clipSequencer.sharedEv.durMod},
 			\rest, Rest(1),
 			\fftXbins, Pfunc{[16, 32, 64, 128, 256].scramble},
 			\fftBinsGain, Pfunc{ 6.collect{ 22.0.rand} },
@@ -54,6 +56,29 @@ var prefix =  "clipSeq";
 	}
 );
 
+OSCdef(\nukePush, { |msg|
+	if(~buzzerStuff.nukeOnOff.asBoolean){
+		switch(~clipSequencer.sharedEv.stopMode.asInteger)
+		{0}{~buzzerStuff.stopNuke}
+		{1}{~buzzerStuff.stopNukeAndReset}
+		{2}{
+			~buzzerStuff.stopNukeAndReset;
+			~toBenni.sendMsg("/clips", 2);
+		}
+		{3}{ // random Clip
+			~buzzerStuff.stopNukeAndReset;
+			~toBenni.sendMsg("/clips", (1+(13.rand)));
+		}
+		{4}{ // ubahn
+			~buzzerStuff.stopNukeAndReset;
+			~toBenni.sendMsg("/clips", 7);
+		}
+
+	}{
+		~buzzerStuff.startNuke
+	}
+}, '/nukePush').fix;
+
 ~clipSequencer.sharedEv.makeOSCdefsForKeys((
 	tdefOnOff: {|onOff|
 		if(onOff.asBoolean){
@@ -70,28 +95,28 @@ var prefix =  "clipSeq";
 			~gameFFT.sharedEv.tdefOnOff = 0;
 		};
 	},
-	nukePush: {|val|
-		if(~buzzerStuff.nukeOnOff.asBoolean){
-			switch(~clipSequencer.sharedEv.stopMode.asInteger)
-			{0}{~buzzerStuff.stopNuke}
-			{1}{~buzzerStuff.stopNukeAndReset}
-			{2}{
-				~buzzerStuff.stopNukeAndReset;
-				~toBenni.sendMsg("/clips", 2);
-			}
-			{3}{ // random Clip
-				~buzzerStuff.stopNukeAndReset;
-				~toBenni.sendMsg("/clips", (1+(13.rand)));
-			}
-			{4}{ // ubahn
-				~buzzerStuff.stopNukeAndReset;
-				~toBenni.sendMsg("/clips", 7);
-			}
-
-		}{
-			~buzzerStuff.startNuke
-		}
+	/*	nukePush: {|val|
+	if(~buzzerStuff.nukeOnOff.asBoolean){
+	switch(~clipSequencer.sharedEv.stopMode.asInteger)
+	{0}{~buzzerStuff.stopNuke}
+	{1}{~buzzerStuff.stopNukeAndReset}
+	{2}{
+	~buzzerStuff.stopNukeAndReset;
+	~toBenni.sendMsg("/clips", 2);
 	}
+	{3}{ // random Clip
+	~buzzerStuff.stopNukeAndReset;
+	~toBenni.sendMsg("/clips", (1+(13.rand)));
+	}
+	{4}{ // ubahn
+	~buzzerStuff.stopNukeAndReset;
+	~toBenni.sendMsg("/clips", 7);
+	}
+
+	}{
+	~buzzerStuff.startNuke
+	}
+	}*/
 ));
 
 /*{

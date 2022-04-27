@@ -1,7 +1,7 @@
 var o, p;
 o = [
 	Event.prNew,  Array.prNew(16),  Dictionary.prNew,  Array.prNew(12),  
-	Dictionary.prNew,  Array.prNew(20),  Dictionary.prNew,  Array.prNew(40),  
+	Dictionary.prNew,  Array.prNew(24),  Dictionary.prNew,  Array.prNew(40),  
 	Point.prNew,  Point.prNew,  Point.prNew,  Point.prNew,  
 	Point.prNew,  Point.prNew,  Point.prNew,  Point.prNew,  
 	Point.prNew,  Point.prNew
@@ -20,16 +20,17 @@ p = [
 	2, [ array: o[3],  size: 3 ],  
 	// Array
 	3, [ nil,  nil,  'specSmallOnOff',  0,  
-		'scopeOnOff',  0,  nil,  nil,  
+		'scopeOnOff',  1.0,  nil,  nil,  
 		'specBigOnOff',  0,  nil,  nil ],  
 	// Dictionary
-	4, [ array: o[5],  size: 5 ],  
+	4, [ array: o[5],  size: 6 ],  
 	// Array
-	5, [ 'amp',  0.5,  'trails',  1,  
+	5, [ nil,  nil,  nil,  nil,  
+		'sample',  1,  'version',  2,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  'speed',  0,  
-		nil,  nil,  nil,  nil,  
-		'sample',  1,  'version',  0 ],  
+		nil,  nil,  'trails',  0.05,  
+		'penWidth',  1.5,  'amp',  2.5 ],  
 	// Dictionary
 	6, [ array: o[7],  size: 10 ],  
 	// Array
@@ -44,24 +45,24 @@ p = [
 		nil,  nil,  'fft',  o[15],  
 		'bass',  o[16],  'melodie',  o[17] ],  
 	// Point
-	8, [ x: 1920.0,  y: 531.0 ],  
+	8, [ x: 1920.0,  y: 486.0 ],  
 	// Point
-	9, [ x: 3004.0,  y: 784.0 ],  
+	9, [ x: 1920.0,  y: 684.0 ],  
 	// Point
-	10, [ x: 1920.0,  y: 191.0 ],  
+	10, [ x: 2498.0,  y: 0.0 ],  
 	// Point
-	11, [ x: 2480.0,  y: 635.0 ],  
+	11, [ x: 2736.0,  y: 0.0 ],  
 	// Point
-	12, [ x: 1756.0,  y: 943.0 ],  
+	12, [ x: 1920.0,  y: 840.0 ],  
 	// Point
-	13, [ x: 2957.0,  y: 231.0 ],  
+	13, [ x: 1880.0,  y: 0.0 ],  
 	// Point
 	14, [ x: 1920.0,  y: 0.0 ],  
 	// Point
-	15, [ x: 1920.0,  y: 483.0 ],  
+	15, [ x: 2652.0,  y: 990.0 ],  
 	// Point
-	16, [ x: 1209.0,  y: 503.0 ],  
+	16, [ x: 2466.0,  y: 240.0 ],  
 	// Point
-	17, [ x: 1920.0,  y: 191.0 ]
+	17, [ x: 2985.0,  y: 0.0 ]
 ];
 prUnarchive(o,p);

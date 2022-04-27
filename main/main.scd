@@ -80,10 +80,6 @@ s.waitForBoot {
 ~rpiAddr.sendMsg("/circles", 0);
 ~rpiAddr.sendMsg("/circles", 1);
 
-~scopeGUI[\onOff].(true)
-~spectograms.big[\onOff].(true)
-~spectograms.small[\onOff].(true)
-
 
 // saving presets
 ~circles.melodieCircle.presetManager[\savePreset].("C16_homophon")
@@ -98,8 +94,12 @@ s.waitForBoot {
 ~circles.melodieCircle.presetManager[\savePreset].("cue8_prep")
 ~circles.melodieCircle.presetManager[\savePreset].("simpleArp")
 
+~clipSequencer.presetManager[\savePreset].("basicOFF")
+
 // GUI presets
-~guiAll.pm[\savePreset].("flower1");
+~guiAll.pm[\savePreset].("fftWaves");
+
+~guiAll.pm[\savePreset].("gabaSpecto");
 
 TempoClock.default.tempo = 1;
 
