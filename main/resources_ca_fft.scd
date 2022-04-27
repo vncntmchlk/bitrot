@@ -1,5 +1,5 @@
 ~caFFT = { |initCaSize = 8, initLastValuesSize = 10, startRules = 30, frontWindow = (false)|
-	var win, game, gameBlockSize = 40;
+	var win, game, gameBlockSize = 30;
 	var newCaSize, newLastValuesSize;
 	var prefix = "fft";
 	var sharedEvFFT = OSCSharedEvent.new(~localHost, prefix);
@@ -12,6 +12,7 @@
 	sharedEvFFT.caRange = [0, 5];
 	sharedEvFFT.tdefOnOff = 0;
 	sharedEvFFT.blockOrPass = 0;
+	sharedEvFFT.fftDepth = 1;
 
 	win = Window.new(prefix, bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize), resizable: false, border: ~guiBorder)
 	.autoRememberPosition(\bitrot, prefix.asSymbol);
@@ -207,18 +208,20 @@
 		var sendDbDummyAllOn = 0!6;//-60!6;
 		var sendDbDummyAllOff = -60!6;
 		var dbArr = [
-			[-70, 1],
-			[-70, 1],
-			[-70, 1],
-			[-70, 1],
-			[-70, 1],
-			[-70, 1]
+			[-70, 0],
+			[-70, 0],
+			[-70, 0],
+			[-70, 0],
+			[-70, 0],
+			[-70, 0]
 		];
 		var emphasizeMidSection = Env.new([0,0.5,1],[0.5,0.5],[3, -3]);
 		var calcDbArray = {
 			var res = if(game.sharedEv.blockOrPass.asBoolean){sendDbDummyAllOn.copy}{sendDbDummyAllOff.copy};
 			game.colSums[game.relevantCa[0]..(game.relevantCa[1] - 1)].do {|v, ix|
-				res[ix + game.delayedCaRange[0]] = emphasizeMidSection[v].linlin(0, 1, *dbArr[ix])
+				res[ix + game.delayedCaRange[0]] = emphasizeMidSection[v].linlin(
+					0, 1, *(dbArr[ix] * game.sharedEv.fftDepth)
+				)
 			};
 			res
 		};
@@ -260,12 +263,12 @@ Pdefn(\caFFTNext, Routine {
 	var sendDbDummyAllOn = 0!6;//-60!6;
 	var sendDbDummyAllOff = -60!6;
 	var dbArr = [
-		[-15, 1],
-		[-9, 1],
-		[-21, 1],
-		[-27, 1],
-		[-36, 1],
-		[-9, 1]
+		[-70, 0],
+		[-70, 0],
+		[-70, 0],
+		[-70, 0],
+		[-70, 0],
+		[-70, 0]
 	];
 	/*	var dbArr = [
 	[-15, 1],
@@ -279,7 +282,9 @@ Pdefn(\caFFTNext, Routine {
 	var calcDbArray = {
 		var res = if(~gameFFT.sharedEv.blockOrPass.asBoolean){sendDbDummyAllOn.copy}{sendDbDummyAllOff.copy};
 		~gameFFT.colSums[~gameFFT.relevantCa[0]..(~gameFFT.relevantCa[1] - 1)].do {|v, ix|
-			res[ix + ~gameFFT.delayedCaRange[0]] = emphasizeMidSection[v].linlin(0, 1, *dbArr[ix])
+			res[ix + ~gameFFT.delayedCaRange[0]] = emphasizeMidSection[v].linlin(
+				0, 1, *(dbArr[ix] * ~gameFFT.sharedEv.fftDepth)
+			)
 		};
 		res
 	};

@@ -1,6 +1,6 @@
 var o, p;
 o = [
-	Event.prNew,  Array.prNew(4),  Dictionary.prNew,  Array.prNew(32),  
+	Event.prNew,  Array.prNew(4),  Dictionary.prNew,  Array.prNew(36),  
 	Array.prNew(2)
 ];
 p = [
@@ -11,16 +11,17 @@ p = [
 	// Array
 	1, [ nil,  nil,  '~gameFFT.sharedEv',  o[2] ],  
 	// Dictionary
-	2, [ array: o[3],  size: 8 ],  
+	2, [ array: o[3],  size: 9 ],  
 	// Array
-	3, [ 'lastValuesSize',  1,  'caSize',  16,  
-		'blendSteps',  1,  'tdefOnOff',  0.0,  
-		'blockOrPass',  0,  nil,  nil,  
-		nil,  nil,  'currentRule',  30,  
+	3, [ nil,  nil,  'currentRule',  30,  
 		'sendRate',  0.25,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
+		'blendSteps',  1,  'caSize',  16,  
+		'fftDepth',  0.54000002145767,  'caRange',  o[4],  
+		'lastValuesSize',  1,  nil,  nil,  
+		'tdefOnOff',  0,  'blockOrPass',  0,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'caRange',  o[4] ],  
+		nil,  nil,  nil,  nil ],  
 	// Array
 	4, [ 0,  5 ]
 ];

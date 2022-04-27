@@ -81,7 +81,7 @@
 [~circles.melodieCircle, ~circles.bassCircle, ~circles.melodie2Circle].do {|instrumentCircle|
 	instrumentCircle.view.drawFunc = {
 		// Pen.scale(2,2);
-		Pen.stringAtPoint(instrumentCircle.guiText, 4@5, Font("Hack", 16), Color.white);
+		//Pen.stringAtPoint(instrumentCircle.guiText, 4@5, Font("Hack", 16), Color.white);
 		Pen.use {
 			var hits = List.new;
 			Pen.translate(instrumentCircle.view.bounds.size.width * 0.25, instrumentCircle.view.bounds.size.height * 0.25);
@@ -127,7 +127,7 @@
 			hits.do {|arr| Pen.color = arr[1]; Pen.addOval(arr[0]); Pen.fill};
 
 			if(instrumentCircle.sharedValues.freezeMe.asBoolean){
-				Pen.color = Color.grey(0,1);
+				Pen.color = Color.cyan(1, 0.5);
 			}{
 				Pen.color = Color.grey(1,0.9);
 			};

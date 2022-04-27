@@ -1,19 +1,19 @@
 
 ~scopeGUI = ();
-~scopeGUI.inputChannels = [12,13];//[4,5];
 ~scopeGUI.winSize = 800; //global window size
 ~scopeGUI.buffer = Buffer.alloc(s, ~scopeGUI.winSize, 1);
 ~scopeGUI.options = ();
-SynthDef(\avTrk, {|in= 0, bufnum, rate= 40, sample= 1|
-	var z = In.ar(in, 1);
+SynthDef(\avTrk, {|bufnum, rate= 40, sample= 1|
+	var z = SoundIn.ar(~guiInputBus); //In.ar(in, 1);
 	var trig= Impulse.ar(rate*0.92);	//compensate
 	var index= Phasor.ar(trig, sample, 0, BufFrames.ir(bufnum)-1);
 	BufWr.ar(z, bufnum, index, 0);
 	SendTrig.ar(trig, 0, bufnum);
+	0
 }).add;
-SynthDef(\avSnd, {|out= 0, bufnum|
-	Out.ar(out, SoundIn.ar(~scopeGUI.inputChannels))
-}).add;
+/*SynthDef(\avSnd, {|out= 0, bufnum|
+	Out.ar(out, SoundIn.ar([~guiInputBus, ~guiInputBus + 1]))
+}).add;*/
 s.sync;
 //--interface
 ~scopeGUI.options.trails= 1;
@@ -21,11 +21,12 @@ s.sync;
 ~scopeGUI.options.sample= 1;
 ~scopeGUI.options.amp= 0.5;
 ~scopeGUI.options.version= 0;
+~scopeGUI.options.penWidth = 5;
 
 ~scopeGUI.onOff = { |onOff|
 	onOff = onOff.asBoolean;
 	~scopeGUI.trk.run(onOff);
-	~scopeGUI.snd.run(onOff);
+	//~scopeGUI.snd.run(onOff);
 	{~scopeGUI.win.visible_(onOff)}.defer
 };
 
@@ -45,20 +46,27 @@ s.sync;
 			~scopeGUI.buffer.getn(0, ~scopeGUI.winSize-1, {|data| {arr= data; u.refresh}.defer});
 		});
 	}, '/tr', s.addr);
-	~scopeGUI.trk = Synth.newPaused(\avTrk, [\in, 0, \bufnum, ~scopeGUI.buffer, \rate, fps]);
-	~scopeGUI.snd = Synth.newPaused(\avSnd, [\out, 0]);
+	~scopeGUI.trk = Synth.newPaused(\avTrk, [\bufnum, ~scopeGUI.buffer, \rate, fps]);
+	//~scopeGUI.snd = Synth.newPaused(\avSnd, [\out, 0]);
 
 	//--main loop
 	u.drawFunc= {
 		~scopeGUI.trk.set(\sample, ~scopeGUI.options.sample);
 		//Pen.alpha = 0.25;
-		Pen.width = 5;
-		Pen.fillColor= ~guiBackgroundColor;//Color.grey(0, ~scopeGUI.options.trails);
+		Pen.width = ~scopeGUI.options.penWidth;
+		if(~scopeGUI.options.trails < 1){
+			u.clearOnRefresh = false;
+			Pen.fillColor = Color.grey(0, ~scopeGUI.options.trails);
+		}{
+			u.clearOnRefresh = true;
+			Pen.fillColor = ~guiBackgroundColor;//Color.grey(0, ~scopeGUI.options.trails);
+		};
+
 		Pen.fillRect(u.bounds);		//manually clear
 		Pen.strokeColor= Color.white;
 		switch(~scopeGUI.options.version,
 			0, {			//line
-				Pen.rotate(theta, width/2, height/2);
+				//Pen.rotate(theta, width/2, height/2);
 				Pen.translate(0, height*0.5);
 				arr.do{|y, x|
 					var p= Point(x, y*(height*~scopeGUI.options.amp));
@@ -77,6 +85,7 @@ s.sync;
 			},
 			2, {			//flower
 				Pen.translate(width*0.5, height*0.5);
+				Pen.scale(~scopeGUI.options.amp, ~scopeGUI.options.amp);
 				Pen.moveTo(Point(arr[0], 0)*arr[0]);
 				arr.do{|y, x|
 					var p= Point(y, x)*y;
@@ -91,9 +100,9 @@ s.sync;
 
 	//--window management
 	//u.clearOnRefresh= false;	//do not erase - just draw on top of
-	u.clearOnRefresh= true;
+	u.clearOnRefresh = true;
 	w.onClose= {
-		~scopeGUI.snd.free;
+		//~scopeGUI.snd.free;
 		~scopeGUI.trk.free;
 		o.free;
 	};

@@ -1,5 +1,5 @@
 ~caBitFlip = { |initCaSize = 8, initLastValuesSize = 10, startRules = 30, frontWindow = (false)|
-	var win, game, gameBlockSize = 40;
+	var win, game, gameBlockSize = 120;
 	var newCaSize, newLastValuesSize;
 	var prefix = "bitflip";
 	var sharedEv = OSCSharedEvent.new(~localHost, prefix);
@@ -22,7 +22,8 @@
 		var cols = sharedEv.caSize, rows = sharedEv.lastValuesSize;
 		cols.do{ |col|
 			rows.do { |row|
-				Pen.color = Color.gray(game.lastValues[row][col]);
+				//Pen.color = Color.gray(game.lastValues[row][col]);
+				Pen.color = Color.cyan(game.lastValues[row][col]).alpha_(game.lastValues[row][col]);
 				Pen.addRect(
 					Rect(col * gameBlockSize, row * gameBlockSize, gameBlockSize, gameBlockSize)
 				);
@@ -31,7 +32,8 @@
 		};
 		game.colSums.do {|val, col|
 			if(col >= game.relevantCa[0] and: {col < game.relevantCa[1]}){ // nicht benutze spalten ueberspringen
-				Pen.color = Color.gray(val);
+				//Pen.color = Color.gray(val);
+				Pen.color = Color.cyan(val).alpha_(val);
 				Pen.addRect(
 					Rect(col * gameBlockSize, rows * gameBlockSize, gameBlockSize, gameBlockSize)
 				);

@@ -13,7 +13,7 @@ var prefix =  "clipSeq";
 ~buzzerStuff = (
 	resetValues: {
 		topEnvironment[\toBenni].sendMsg("/clips", 0);
-		topEnvironment[\toBenni].sendMsg("/bitrotData", "fftXbins", *[16, 32, 64, 128, 256]);
+		topEnvironment[\toBenni].sendMsg("/bitrotData", "fftXbins", *[4, 8, 16, 32, 64]); //[16, 32, 64, 128, 256]
 		topEnvironment[\toBenni].sendMsg("/bitrotData", "fftBinsGain", *[0, 0, 0, 0, 0, 0]);
 		topEnvironment[\toBenni].sendMsg("/bitrotData", "xorBits", *[0,0,0,0,0,0,0,0,0,0]);
 		topEnvironment[\toBenni].sendMsg("/bitrotData", "groupSRR", 1);

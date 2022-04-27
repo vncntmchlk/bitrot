@@ -1,0 +1,28 @@
+var o, p;
+o = [
+	Event.prNew,  Array.prNew(4),  Dictionary.prNew,  Array.prNew(36),  
+	Array.prNew(2)
+];
+p = [
+	// Event
+	0, [ array: o[1],  size: 1,  
+		proto: nil,  parent: nil,  
+		know: true ],  
+	// Array
+	1, [ nil,  nil,  '~gameFFT.sharedEv',  o[2] ],  
+	// Dictionary
+	2, [ array: o[3],  size: 9 ],  
+	// Array
+	3, [ nil,  nil,  'currentRule',  30,  
+		'sendRate',  1.0,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'blendSteps',  10,  'caSize',  16,  
+		'fftDepth',  1.0,  'caRange',  o[4],  
+		'lastValuesSize',  2,  nil,  nil,  
+		'tdefOnOff',  0.0,  'blockOrPass',  1.0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil ],  
+	// Array
+	4, [ 2,  5 ]
+];
+prUnarchive(o,p);

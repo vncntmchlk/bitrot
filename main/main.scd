@@ -10,17 +10,21 @@
 //gaba preset: 10th und accelerando zu tempo clock 2.5, schnelle melodie kommt spaeter dazu
 
 ~toBenni = NetAddr("192.168.1.101", 7401); // PORT
+~toBenni = NetAddr("169.254.85.142", 7401);
+
 // bei 21 clicks hoerbar????
 // bei gaba bass auf 10er vorher
 // anfang ueben und fft tiefe einbauen
 
+// das rpiStream ding muss manuell vom windowBorder befreit werden ..
 
 (
 s.latency= 0.05;
 s.waitForBoot {
 	// global Window settings.
-	~guiBorder = true; // borderless windows
-	~guiBackgroundColor = Color.grey(0, 1); // background alpha
+	~guiBorder = false; // window borders
+	~guiBackgroundColor = Color.grey(0, 0); // background alpha
+	~guiInputBus = 2;
 
 	// network objects
 	thisProcess.openUDPPort(9010); // from open stage control
@@ -95,7 +99,7 @@ s.waitForBoot {
 ~circles.melodieCircle.presetManager[\savePreset].("simpleArp")
 
 // GUI presets
-~guiAll.pm[\savePreset].("useless1");
+~guiAll.pm[\savePreset].("flower1");
 
 TempoClock.default.tempo = 1;
 
