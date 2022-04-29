@@ -25,7 +25,7 @@ p = [
 	// Dictionary
 	4, [ array: o[5],  size: 6 ],  
 	// Array
-	5, [ 'noteArrayLen',  15,  'monoMode',  0,  
+	5, [ 'noteArrayLen',  10,  'monoMode',  0,  
 		'linkToRhy1Mute',  0,  nil,  nil,  
 		nil,  nil,  'freezeMe',  0,  
 		nil,  nil,  'onOff',  1,  

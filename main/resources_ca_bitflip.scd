@@ -12,8 +12,8 @@
 	sharedEv.caRange = [0, 9];
 	sharedEv.tdefOnOff = 0;
 
-	win = Window.new(prefix, bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize),resizable: false, border: ~guiBorder)
-	.autoRememberPosition(\bitrot, prefix.asSymbol);
+	win = Window.new(prefix, bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize),resizable: false, border: ~guiBorder);
+	//.autoRememberPosition(\bitrot, prefix.asSymbol);
 	if(frontWindow){
 		win.front
 	};

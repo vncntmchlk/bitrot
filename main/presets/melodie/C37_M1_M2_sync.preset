@@ -31,11 +31,11 @@ p = [
 		nil,  nil,  nil,  nil,  
 		'muteEveryX',  0,  'onOff',  1,  
 		'circleLegato',  0.18999999761581,  nil,  nil,  
-		'loopSpeedLevel',  1.0,  nil,  nil ],  
+		'loopSpeedLevel',  1,  nil,  nil ],  
 	// Dictionary
 	6, [ array: o[7],  size: 6 ],  
 	// Array
-	7, [ 'noteArrayLen',  15,  'monoMode',  1,  
+	7, [ 'noteArrayLen',  10,  'monoMode',  1,  
 		'linkToRhy1Mute',  0,  nil,  nil,  
 		nil,  nil,  'freezeMe',  0,  
 		nil,  nil,  'onOff',  1,  

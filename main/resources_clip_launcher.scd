@@ -53,31 +53,33 @@ var prefix =  "clipSeq";
 		self.nukeOnOff = 0;
 		self.nukePbind.stop;
 		self.resetValues
+	},
+	nukePressFunction: {
+		"Buzzer PRESSED".postln;
+		if(~buzzerStuff.nukeOnOff.asBoolean){
+			switch(~clipSequencer.sharedEv.stopMode.asInteger)
+			{0}{~buzzerStuff.stopNuke}
+			{1}{~buzzerStuff.stopNukeAndReset}
+			{2}{
+				~buzzerStuff.stopNukeAndReset;
+				~toBenni.sendMsg("/clips", 2);
+			}
+			{3}{ // random Clip
+				~buzzerStuff.stopNukeAndReset;
+				~toBenni.sendMsg("/clips", (1+(13.rand)));
+			}
+			{4}{ // ubahn
+				~buzzerStuff.stopNukeAndReset;
+				~toBenni.sendMsg("/clips", 7);
+			}
+
+		}{
+			~buzzerStuff.startNuke
+		}
 	}
 );
 
-OSCdef(\nukePush, { |msg|
-	if(~buzzerStuff.nukeOnOff.asBoolean){
-		switch(~clipSequencer.sharedEv.stopMode.asInteger)
-		{0}{~buzzerStuff.stopNuke}
-		{1}{~buzzerStuff.stopNukeAndReset}
-		{2}{
-			~buzzerStuff.stopNukeAndReset;
-			~toBenni.sendMsg("/clips", 2);
-		}
-		{3}{ // random Clip
-			~buzzerStuff.stopNukeAndReset;
-			~toBenni.sendMsg("/clips", (1+(13.rand)));
-		}
-		{4}{ // ubahn
-			~buzzerStuff.stopNukeAndReset;
-			~toBenni.sendMsg("/clips", 7);
-		}
-
-	}{
-		~buzzerStuff.startNuke
-	}
-}, '/nukePush').fix;
+OSCdef(\nukePush, {~buzzerStuff[\nukePressFunction].value}, '/nukePush').fix;
 
 ~clipSequencer.sharedEv.makeOSCdefsForKeys((
 	tdefOnOff: {|onOff|

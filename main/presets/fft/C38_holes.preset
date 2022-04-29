@@ -14,10 +14,10 @@ p = [
 	2, [ array: o[3],  size: 9 ],  
 	// Array
 	3, [ nil,  nil,  'currentRule',  30,  
-		'sendRate',  4.0,  nil,  nil,  
+		'sendRate',  5.0,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		'blendSteps',  1,  'caSize',  16,  
-		'fftDepth',  0.91000002622604,  'caRange',  o[4],  
+		'blendSteps',  4,  'caSize',  16,  
+		'fftDepth',  0.76999998092651,  'caRange',  o[4],  
 		'lastValuesSize',  1,  nil,  nil,  
 		'tdefOnOff',  1.0,  'blockOrPass',  1.0,  
 		nil,  nil,  nil,  nil,  

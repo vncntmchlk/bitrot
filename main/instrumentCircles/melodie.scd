@@ -31,9 +31,10 @@ OSCdef(\philippMelody, {|msg|
 	var minTimeInBetween = 0.05; // 20 hz
 	ev.sendIndexFunc = { |self, index|
 		if(~circles.melodieCircle.sharedValues.onOff.asBoolean){
+			var combinedHits = ~circles.circleArray[0].hits | ~circles.circleArray[1].hits | ~circles.circleArray[2].hits;
 			var now = SystemClock.seconds;
 			//if((now - ~circles.melodieCircle.lastTime) > minTimeInBetween){
-			~toPhilipp.sendMsg("/melodyIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+			~toPhilipp.sendMsg("/melodyIndex", index, self.waitRateNow * thisThread.clock.tempo.reciprocal, *combinedHits.as(Array));
 			~circles.melodieCircle.lastTime = now
 			//}
 		}

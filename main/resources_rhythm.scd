@@ -134,8 +134,8 @@
 	ev.gameBlockRow = 40 / 1.61803398875;
 	ev.gameBlockCol = 40;
 	ev.win = Window.new(prefix, bounds: Rect(0,0,(ev.maxSize * ev.gameBlockCol),(ev.maxSize * ev.gameBlockRow)), border: ~guiBorder)
-	.background_(~guiBackgroundColor)
-	.autoRememberPosition(\bitrot, prefix.asSymbol);
+	.background_(~guiBackgroundColor);
+	//.autoRememberPosition(\bitrot, prefix.asSymbol);
 	if(frontWindow){
 		ev.win.front;
 	};

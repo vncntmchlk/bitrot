@@ -14,8 +14,8 @@
 	sharedEvFFT.blockOrPass = 0;
 	sharedEvFFT.fftDepth = 1;
 
-	win = Window.new(prefix, bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize), resizable: false, border: ~guiBorder)
-	.autoRememberPosition(\bitrot, prefix.asSymbol);
+	win = Window.new(prefix, bounds: (initCaSize * gameBlockSize)@((initLastValuesSize + 1) * gameBlockSize), resizable: false, border: ~guiBorder);
+	//.autoRememberPosition(\bitrot, prefix.asSymbol);
 	if(frontWindow){
 		win.front
 	};
@@ -288,7 +288,9 @@ Pdefn(\caFFTNext, Routine {
 		};
 		res
 	};
+	//var colorPseq = Pwrand([Color.white, Color.red],[0.8,0.2],inf).asStream;
 	loop {
+		//{~scopeGUI.options.penColor = colorPseq.next}.defer;
 		// var blendSteps = ~gameFFT.sharedEv.blendSteps;
 		~gameFFT.nextGen;
 		sendDb = calcDbArray.();

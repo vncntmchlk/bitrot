@@ -38,6 +38,7 @@ OSCdef(\resolution, { |msg|
 		circleNum: circleNum,
 		testAngle: 0,
 		guiHit: 0,
+		hits: Set.new,
 		guiColor: guiColor,
 		taktLen: 16,
 		taktIndex: 0,
@@ -86,8 +87,9 @@ OSCdef(\resolution, { |msg|
 		ev.taktIndex = 0;
 		loop {
 			var waitRate;
-			var hits = Set.new;
+			//var hits = Set.new;
 			var circleSlice;
+			ev.hits.clear;
 			if(ev.taktIndex == 0){
 				if(~circles[symCircle].sharedValues.noteArrayLen != ~circles[symCircle].taktLen){
 					~circles[symCircle].taktLen = ~circles[symCircle].sharedValues.noteArrayLen.copy;
@@ -111,7 +113,7 @@ OSCdef(\resolution, { |msg|
 			// intersections in die taktIndices einteilen
 			if(ev.intersections.notNil && ev.muteNow.not){
 				ev.intersections.do {|ang, ix|
-					hits.add(
+					ev.hits.add(
 						ang[0]
 						.linlin(0,360,0, ev.taktLen - 0.001)
 						// .round(1)
@@ -119,14 +121,14 @@ OSCdef(\resolution, { |msg|
 						.asInteger
 					);
 				};
-				if(hits.includes(ev.taktIndex)){
+				if(ev.hits.includes(ev.taktIndex)){
 					// var velocityOfCircle = (i % 90).fold2(45).linlin(0,44,10,127);
 					// var velocityOfClock = ~circles.quantAmps[thisThread.beats.mod(4)];
 					ev.guiHit = 24;
 					ev.noteFunc(100, ev.taktIndex);
 				};
 				// einer vor taktIndex
-				if(hits.includes((ev.taktIndex + 1) % ev.taktLen)){
+				if(ev.hits.includes((ev.taktIndex + 1) % ev.taktLen)){
 					ev.sendIndexFunc((ev.taktIndex + 1) % ev.taktLen)
 				};
 				//[circleNum, hits, ev.taktIndex].postln;

@@ -39,7 +39,7 @@
 
 	~circles.guiElements[symWindow] = Window(name,
 		Rect(0, 0, ~circles.guiElements.res2[1] + makeWindowBigger,~circles.guiElements.res2[0] + makeWindowBigger), false, ~guiBorder
-	).autoRememberPosition(\bitrot, name.asSymbol);
+	).alwaysOnTop_(true); //.autoRememberPosition(\bitrot, name.asSymbol)
 	~circles.guiElements[symWindow].view.background = ~guiBackgroundColor;
 	~circles[symCircle].view = UserView(
 		~circles.guiElements[symWindow],

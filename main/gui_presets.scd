@@ -2,10 +2,12 @@ var prefix = "gui";
 ~guiAll = ();
 ~guiAll.sharedEv = OSCSharedEvent.new(~localHost, prefix);
 ~guiAll.sharedEv.scopeOnOff = 0;
+~guiAll.sharedEv.scopeFps = 60;
 ~guiAll.sharedEv.specBigOnOff = 0;
 ~guiAll.sharedEv.specSmallOnOff = 0;
 ~guiAll.sharedEv.makeOSCdefsForKeys((
 	scopeOnOff: (~scopeGUI[\onOff].(_)),
+	scopeFps: {|val| ~scopeGUI.trk.set(\rate, val)},
 	specBigOnOff: (~spectograms.big[\onOff].(_)),
 	specSmallOnOff: (~spectograms.small[\onOff].(_))
 ));
@@ -13,8 +15,6 @@ var prefix = "gui";
 ~guiAll.pm = ~makePresetManagerGUI.(prefix,
 	["~guiAll.pm.positions","~scopeGUI.options","~guiAll.sharedEv"]
 );
-
-
 
 
 //change these while the program is running

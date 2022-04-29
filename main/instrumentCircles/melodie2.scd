@@ -22,9 +22,10 @@
 	var minTimeInBetween = 0.05; // 20 hz
 	ev.sendIndexFunc = { |self, index|
 		if(~circles.melodie2Circle.sharedValues.onOff.asBoolean){
+			var combinedHits = ~circles.circleArray[5].hits | ~circles.circleArray[6].hits;
 			var now = SystemClock.seconds;
 			//if((now - ~circles.melodie2Circle.lastTime) > minTimeInBetween){
-			~toPhilipp.sendMsg("/melody2Index", index, self.waitRateNow * thisThread.clock.tempo.reciprocal);
+			~toPhilipp.sendMsg("/melody2Index", index, self.waitRateNow * thisThread.clock.tempo.reciprocal, *combinedHits.as(Array));
 			~circles.melodie2Circle.lastTime = now
 			//}
 		}

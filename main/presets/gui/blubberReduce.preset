@@ -1,10 +1,10 @@
 var o, p;
 o = [
-	Event.prNew,  Array.prNew(16),  Dictionary.prNew,  Array.prNew(12),  
-	Dictionary.prNew,  Array.prNew(24),  Dictionary.prNew,  Array.prNew(40),  
+	Event.prNew,  Array.prNew(16),  Dictionary.prNew,  Array.prNew(16),  
+	Dictionary.prNew,  Array.prNew(28),  Color.prNew,  Dictionary.prNew,  
+	Array.prNew(40),  Point.prNew,  Point.prNew,  Point.prNew,  
 	Point.prNew,  Point.prNew,  Point.prNew,  Point.prNew,  
-	Point.prNew,  Point.prNew,  Point.prNew,  Point.prNew,  
-	Point.prNew,  Point.prNew
+	Point.prNew,  Point.prNew,  Point.prNew
 ];
 p = [
 	// Event
@@ -14,55 +14,60 @@ p = [
 	// Array
 	1, [ '~guiAll.sharedEv',  o[2],  '~scopeGUI.options',  o[4],  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  '~guiAll.pm.positions',  o[6],  
+		nil,  nil,  '~guiAll.pm.positions',  o[7],  
 		nil,  nil,  nil,  nil ],  
 	// Dictionary
-	2, [ array: o[3],  size: 3 ],  
+	2, [ array: o[3],  size: 4 ],  
 	// Array
-	3, [ nil,  nil,  'specSmallOnOff',  0,  
-		'scopeOnOff',  0.0,  nil,  nil,  
-		'specBigOnOff',  0,  nil,  nil ],  
+	3, [ 'scopeFps',  60,  nil,  nil,  
+		'specBigOnOff',  0,  nil,  nil,  
+		nil,  nil,  'specSmallOnOff',  0,  
+		nil,  nil,  'scopeOnOff',  0.0 ],  
 	// Dictionary
-	4, [ array: o[5],  size: 6 ],  
+	4, [ array: o[5],  size: 7 ],  
 	// Array
-	5, [ nil,  nil,  nil,  nil,  
-		'sample',  1,  'version',  2,  
-		nil,  nil,  nil,  nil,  
-		nil,  nil,  'speed',  0,  
+	5, [ 'version',  2,  'speed',  0,  
+		'sample',  1,  'penColor',  o[6],  
 		nil,  nil,  'trails',  0.05,  
-		'penWidth',  1.5,  'amp',  2.5 ],  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'amp',  2.5,  nil,  nil,  
+		nil,  nil,  'penWidth',  1.5 ],  
+	// Color
+	6, [ red: 1.0,  green: 1.0,  
+		blue: 1.0,  alpha: 1.0 ],  
 	// Dictionary
-	6, [ array: o[7],  size: 10 ],  
+	7, [ array: o[8],  size: 10 ],  
 	// Array
-	7, [ 'rhy2',  o[8],  nil,  nil,  
+	8, [ 'rhy2',  o[9],  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'rhy1',  o[9],  
-		'melodie2',  o[10],  'spectogramSmall',  o[11],  
+		nil,  nil,  'rhy1',  o[10],  
+		'melodie2',  o[11],  'spectogramSmall',  o[12],  
 		nil,  nil,  nil,  nil,  
-		'bitflip',  o[12],  'scopeGUI',  o[13],  
+		'bitflip',  o[13],  'scopeGUI',  o[14],  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'spectogramBig',  o[14],  
-		nil,  nil,  'fft',  o[15],  
-		'bass',  o[16],  'melodie',  o[17] ],  
+		nil,  nil,  'spectogramBig',  o[15],  
+		nil,  nil,  'fft',  o[16],  
+		'bass',  o[17],  'melodie',  o[18] ],  
 	// Point
-	8, [ x: 1920.0,  y: 486.0 ],  
+	9, [ x: 1920.0,  y: 486.0 ],  
 	// Point
-	9, [ x: 1920.0,  y: 684.0 ],  
+	10, [ x: 1920.0,  y: 684.0 ],  
 	// Point
-	10, [ x: 2498.0,  y: 0.0 ],  
+	11, [ x: 2472.0,  y: 272.0 ],  
 	// Point
-	11, [ x: 2736.0,  y: 0.0 ],  
+	12, [ x: 2736.0,  y: 0.0 ],  
 	// Point
-	12, [ x: 1920.0,  y: 840.0 ],  
+	13, [ x: 1920.0,  y: 840.0 ],  
 	// Point
-	13, [ x: 1880.0,  y: 0.0 ],  
+	14, [ x: 1880.0,  y: 0.0 ],  
 	// Point
-	14, [ x: 1920.0,  y: 0.0 ],  
+	15, [ x: 1920.0,  y: 0.0 ],  
 	// Point
-	15, [ x: 2652.0,  y: 990.0 ],  
+	16, [ x: 2652.0,  y: 990.0 ],  
 	// Point
-	16, [ x: 2466.0,  y: 240.0 ],  
+	17, [ x: 2466.0,  y: 240.0 ],  
 	// Point
-	17, [ x: 2985.0,  y: 0.0 ]
+	18, [ x: 2935.0,  y: 270.0 ]
 ];
 prUnarchive(o,p);

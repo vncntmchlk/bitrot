@@ -14,11 +14,11 @@ p = [
 	2, [ array: o[3],  size: 7 ],  
 	// Array
 	3, [ 'tdefOnOff',  1.0,  nil,  nil,  
-		nil,  nil,  'sendRate',  0.5,  
+		nil,  nil,  'sendRate',  4.0,  
 		'blendSteps',  1,  nil,  nil,  
 		nil,  nil,  'caSize',  16,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'currentRule',  121,  
+		nil,  nil,  'currentRule',  30,  
 		'lastValuesSize',  1,  'caRange',  o[4] ],  
 	// Array
 	4, [ 9,  9 ]

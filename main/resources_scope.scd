@@ -22,6 +22,7 @@ s.sync;
 ~scopeGUI.options.amp= 0.5;
 ~scopeGUI.options.version= 0;
 ~scopeGUI.options.penWidth = 5;
+~scopeGUI.options.penColor = Color.white;
 
 ~scopeGUI.onOff = { |onOff|
 	onOff = onOff.asBoolean;
@@ -34,19 +35,19 @@ s.sync;
 	//--setup
 	var width= ~scopeGUI.winSize, height= ~scopeGUI.winSize;
 	var w= Window("scope", Rect(99, 99, width, height),false,~guiBorder)
-	.background_(Color.grey(0,0)).autoRememberPosition(\bitrot, \scopeGUI);
+	.background_(Color.grey(0,0));//.autoRememberPosition(\bitrot, \scopeGUI);
 	var u= UserView(w, Rect(0, 0, width, height));
 
 	//--variables
 	var theta= 0;
-	var fps= 60;
+	var initFps= 60;
 	var arr= Array.fill(~scopeGUI.winSize, 0);		//same as half windowsize above
 	var o= OSCFunc({|m|
 		if(m[2]==0, {			//redraw once for each cycle of amps
 			~scopeGUI.buffer.getn(0, ~scopeGUI.winSize-1, {|data| {arr= data; u.refresh}.defer});
 		});
 	}, '/tr', s.addr);
-	~scopeGUI.trk = Synth.newPaused(\avTrk, [\bufnum, ~scopeGUI.buffer, \rate, fps]);
+	~scopeGUI.trk = Synth.newPaused(\avTrk, [\bufnum, ~scopeGUI.buffer, \rate, initFps]);
 	//~scopeGUI.snd = Synth.newPaused(\avSnd, [\out, 0]);
 
 	//--main loop
@@ -63,7 +64,7 @@ s.sync;
 		};
 
 		Pen.fillRect(u.bounds);		//manually clear
-		Pen.strokeColor= Color.white;
+		Pen.strokeColor= ~scopeGUI.options.penColor;
 		switch(~scopeGUI.options.version,
 			0, {			//line
 				//Pen.rotate(theta, width/2, height/2);
